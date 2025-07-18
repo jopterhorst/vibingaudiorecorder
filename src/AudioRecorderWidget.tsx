@@ -14,11 +14,13 @@ export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: {
     const [recording, setRecording] = useState(false);
     const [uploading, setUploading] = useState(false);
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const mediaStreamRef = useRef<MediaStream | null>(null);
     const audioChunks = useRef<Blob[]>([]);
 
     const startRecording = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaStreamRef.current = stream; // Store stream reference
             const mediaRecorder = new MediaRecorder(stream);
             mediaRecorderRef.current = mediaRecorder;
             audioChunks.current = [];
@@ -30,6 +32,14 @@ export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: {
             };
 
             mediaRecorder.onstop = async () => {
+                // Ensure media stream is stopped when recording ends
+                if (mediaStreamRef.current) {
+                    mediaStreamRef.current.getTracks().forEach(track => {
+                        track.stop();
+                    });
+                    mediaStreamRef.current = null;
+                }
+                
                 const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
                 // Don't create URL for playback - we don't want to show the player
                 // const url = URL.createObjectURL(audioBlob);
@@ -51,6 +61,15 @@ export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: {
         if (mediaRecorderRef.current && recording) {
             mediaRecorderRef.current.stop();
             setRecording(false);
+            
+            // Stop all tracks in the media stream to release microphone access
+            if (mediaStreamRef.current) {
+                mediaStreamRef.current.getTracks().forEach(track => {
+                    track.stop();
+                });
+                mediaStreamRef.current = null;
+                console.log("Debug: Media stream stopped and microphone released");
+            }
         }
     };
 
