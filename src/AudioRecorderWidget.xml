@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<widget id="mendix.audiorecorderwidget.AudioRecorderWidget" pluginWidget="true" needsEntityContext="true" offlineCapable="true"
+        supportedPlatform="Web"
+        xmlns="http://www.mendix.com/widget/1.0/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.mendix.com/widget/1.0/ ../node_modules/mendix/custom_widget.xsd">
+    <name>Audio Recorder Widget</name>
+    <description>Widget to record audio from the microphone and store it in a Mendix app</description>
+    <icon/>
+    <properties>
+        <propertyGroup caption="General">
+            <property key="audioContentAttribute" type="attribute" required="true">
+                <caption>Audio Content Attribute</caption>
+                <description>String attribute to store the recorded audio as base64</description>
+                <attributeTypes>
+                    <attributeType name="String"/>
+                </attributeTypes>
+            </property>
+        </propertyGroup>
+        <propertyGroup caption="Events">
+            <property key="onChangeAction" type="action" required="false">
+                <caption>On Change Action</caption>
+                <description>Action to execute after the audio is recorded and stored</description>
+            </property>
+        </propertyGroup>
+    </properties>
+</widget>
