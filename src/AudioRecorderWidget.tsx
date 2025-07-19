@@ -10,7 +10,7 @@ declare global {
 import { ReactElement, createElement, useRef, useState, useEffect } from "react";
 import "./ui/AudioRecorderWidget.css";
 
-export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: { audioContentAttribute: any; onChangeAction?: any }): ReactElement {
+export function AudioRecorderWidget({ audioContentAttribute, audioFormat, onChangeAction }: { audioContentAttribute: any; audioFormat: "webm" | "wav"; onChangeAction?: any }): ReactElement {
     const [recording, setRecording] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
@@ -23,6 +23,33 @@ export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: {
     const audioContextRef = useRef<AudioContext | null>(null);
     const analyzerRef = useRef<AnalyserNode | null>(null);
     const animationRef = useRef<number | null>(null);
+
+    // Format detection and MIME type selection
+    const getAudioMimeType = (format: "webm" | "wav"): string => {
+        if (format === "wav") {
+            // Check for WAV support, fallback to PCM
+            if (MediaRecorder.isTypeSupported("audio/wav")) {
+                return "audio/wav";
+            } else if (MediaRecorder.isTypeSupported("audio/wave")) {
+                return "audio/wave";
+            } else if (MediaRecorder.isTypeSupported("audio/x-wav")) {
+                return "audio/x-wav";
+            } else {
+                console.warn("WAV format not supported, falling back to WebM");
+                return "audio/webm";
+            }
+        } else {
+            // WebM format options
+            if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
+                return "audio/webm;codecs=opus";
+            } else if (MediaRecorder.isTypeSupported("audio/webm")) {
+                return "audio/webm";
+            } else {
+                // Final fallback
+                return "";
+            }
+        }
+    };
 
     // Timer effect
     useEffect(() => {
@@ -117,7 +144,13 @@ export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: {
             
             console.log("Audio analyzer setup complete, buffer length:", analyzerRef.current.frequencyBinCount);
 
-            const mediaRecorder = new MediaRecorder(stream);
+            // Get the appropriate MIME type for the selected format
+            const mimeType = getAudioMimeType(audioFormat);
+            console.log("Selected audio format:", audioFormat, "MIME type:", mimeType);
+
+            // Create MediaRecorder with format-specific options
+            const options = mimeType ? { mimeType } : {};
+            const mediaRecorder = new MediaRecorder(stream, options);
             mediaRecorderRef.current = mediaRecorder;
             audioChunks.current = [];
 
@@ -148,7 +181,12 @@ export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: {
                     mediaStreamRef.current = null;
                 }
                 
-                const audioBlob = new Blob(audioChunks.current, { type: 'audio/webm' });
+                // Create blob with the correct MIME type
+                const selectedMimeType = getAudioMimeType(audioFormat);
+                const audioBlob = new Blob(audioChunks.current, { 
+                    type: selectedMimeType || (audioFormat === "wav" ? "audio/wav" : "audio/webm")
+                });
+                console.log("Created audio blob with type:", audioBlob.type, "size:", audioBlob.size);
                 await storeAudioAsBase64(audioBlob);
             };
 
@@ -300,10 +338,10 @@ export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: {
             </div>
 
             <div className={`status-text ${uploading ? 'processing' : ''}`}>
-                {uploading ? "Processing audio..." : 
-                 recording ? "Recording in progress..." : 
-                 recordingTime > 0 ? "Recording completed" : 
-                 "Ready to record"}
+                {uploading ? `Processing ${audioFormat.toUpperCase()} audio...` : 
+                 recording ? `Recording ${audioFormat.toUpperCase()} in progress...` : 
+                 recordingTime > 0 ? `${audioFormat.toUpperCase()} recording completed` : 
+                 `Ready to record ${audioFormat.toUpperCase()}`}
             </div>
         </div>
     );
