@@ -22,5 +22,23 @@
                 <description>Action to execute after the audio is recorded and stored</description>
             </property>
         </propertyGroup>
+        <propertyGroup caption="Text Configuration">
+            <property key="readyText" type="string" required="false" defaultValue="Press record to start">
+                <caption>Ready Text</caption>
+                <description>Text shown when ready to record</description>
+            </property>
+            <property key="recordingText" type="string" required="false" defaultValue="Recording in progress...">
+                <caption>Recording Text</caption>
+                <description>Text shown while recording</description>
+            </property>
+            <property key="processingText" type="string" required="false" defaultValue="Processing audio...">
+                <caption>Processing Text</caption>
+                <description>Text shown while processing audio</description>
+            </property>
+            <property key="completedText" type="string" required="false" defaultValue="Recording completed">
+                <caption>Completed Text</caption>
+                <description>Text shown when recording is completed</description>
+            </property>
+        </propertyGroup>
     </properties>
 </widget>

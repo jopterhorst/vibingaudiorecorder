@@ -9,6 +9,7 @@ declare global {
 
 import { ReactElement, createElement, useRef, useState, useEffect } from "react";
 import fixWebmDuration from "webm-duration-fix";
+import { AudioRecorderWidgetContainerProps } from "../typings/AudioRecorderWidgetProps";
 import "./ui/AudioRecorderWidget.css";
 
 // Debug logging helper - only logs in development
@@ -18,7 +19,15 @@ const debugLog = (message: string, ...args: any[]) => {
     }
 };
 
-export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: { audioContentAttribute: any; onChangeAction?: any }): ReactElement {
+export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): ReactElement {
+    const { 
+        audioContentAttribute, 
+        onChangeAction,
+        readyText,
+        recordingText,
+        processingText,
+        completedText
+    } = props;
     const [recording, setRecording] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
@@ -298,31 +307,12 @@ export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: {
                         console.log("Debug: Base64 content stored in attribute");
 
                         // Trigger the onChange action
-                        console.log("Debug: onChangeAction object:", onChangeAction);
-                        if (onChangeAction) {
-                            if (typeof onChangeAction === 'function') {
-                                console.log("Debug: onChangeAction is a function, calling directly");
-                                onChangeAction();
-                            } else if (onChangeAction.execute && typeof onChangeAction.execute === 'function') {
-                                console.log("Debug: Calling onChangeAction.execute()");
-                                onChangeAction.execute();
-                            } else if (onChangeAction.get && typeof onChangeAction.get === 'function') {
-                                console.log("Debug: Calling onChangeAction.get().execute()");
-                                const action = onChangeAction.get();
-                                if (action && action.execute) {
-                                    action.execute();
-                                }
-                            } else {
-                                console.log("Debug: onChangeAction structure:", Object.keys(onChangeAction || {}));
-                                console.log("Debug: Trying to call onChangeAction directly as function");
-                                try {
-                                    onChangeAction();
-                                } catch (e) {
-                                    console.error("Debug: Failed to call onChangeAction:", e);
-                                }
-                            }
+                        debugLog("Debug: onChangeAction object:", onChangeAction);
+                        if (onChangeAction && onChangeAction.canExecute && onChangeAction.canExecute) {
+                            debugLog("Debug: Executing onChangeAction");
+                            onChangeAction.execute();
                         } else {
-                            console.log("Debug: No onChangeAction provided");
+                            debugLog("Debug: No onChangeAction provided or cannot execute");
                         }
 
                         // Success - no popup message
@@ -398,16 +388,16 @@ export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: {
                     </div>
                 ) : (
                     <div className="waveform-placeholder">
-                        {recordingTime > 0 ? "Recording completed" : "Press record to start"}
+                        {recordingTime > 0 ? completedText : readyText}
                     </div>
                 )}
             </div>
 
             <div className={`status-text ${uploading ? 'processing' : ''}`}>
-                {uploading ? `Processing WEBM audio...` : 
-                 recording ? `Recording WEBM in progress...` : 
-                 recordingTime > 0 ? `WEBM recording completed` : 
-                 `Ready to record WEBM`}
+                {uploading ? processingText : 
+                 recording ? recordingText : 
+                 recordingTime > 0 ? completedText : 
+                 readyText}
             </div>
         </div>
     );

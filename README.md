@@ -16,7 +16,8 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 📱 **Browser Compatible** - Works with modern browsers supporting MediaRecorder API  
 🔧 **Duration Fixing** - Automatically fixes WebM duration metadata using webm-duration-fix library  
 ⏰ **Recording Limit** - Automatic recording stop after 2 hours for security and performance  
-🛡️ **Security Enhanced** - Production-safe logging and improved error handling  
+🛡️ **Security Enhanced** - Production-safe logging and error handling  
+🎨 **Configurable Text** - Customize all UI text messages for different languages and use cases  
 ✨ **Vibe Coded** - This entire widget was crafted with pure vibes and good energy 🌟  
 
 ## Usage
@@ -27,6 +28,11 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 2. **Configure the properties**:
    - **Audio Content Attribute**: Select a string attribute where the base64 audio will be stored
    - **On Change Action**: Select a microflow/nanoflow to execute after recording
+   - **Text Configuration**: Customize the UI text messages:
+     - **Ready Text**: Text shown when ready to record (default: "Press record to start")
+     - **Recording Text**: Text shown while recording (default: "Recording in progress...")
+     - **Processing Text**: Text shown while processing audio (default: "Processing audio...")
+     - **Completed Text**: Text shown when recording is completed (default: "Recording completed")
 3. **Recording workflow**:
    - User clicks "Record" → microphone access requested and recording starts
    - User clicks "Stop Recording" → recording stops and processing begins
@@ -40,6 +46,12 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 Context Object: Services_Integration.VibeFile
 Audio Content Attribute: VibeFile.AudioBase64
 On Change Action: ACT_ProcessAudioFile
+
+Text Configuration (optional - customize for your language/use case):
+Ready Text: "Click to start recording"
+Recording Text: "Recording your voice..."
+Processing Text: "Processing your recording..."
+Completed Text: "Recording saved successfully"
 ```
 
 ### Processing Audio Data
@@ -127,7 +139,7 @@ Clone this repository and import the widget into your Mendix project to see it i
 🔒 **Production-Safe Logging** - Debug logs only appear in development environments  
 🧹 **Memory Management** - Proper cleanup of audio contexts, media streams, and event listeners  
 🎯 **Input Validation** - Validates audio blobs and handles errors gracefully  
-⚡ **No Vulnerabilities** - All dependencies are regularly updated and audited for security issues
+🌐 **Customizable UI Text** - All user-facing text can be configured for localization and branding  
 
 ## Issues, Suggestions and Feature Requests
 
@@ -169,14 +181,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Version History
 
-- **v1.0.0** - Initial release with modern UI, real-time waveform animation, and recording timer.
-- **v1.1.0** - Added security enhancements:
-  - Automatic recording limit (2 hours)
-  - Production-safe debug logging
-  - WebM duration metadata fixing with webm-duration-fix library
-  - Updated React Native to 0.75.4 for security fixes
-  - Improved error handling and memory management
-
+- **v1.0.0** - Initial release with configurable UI text, enhanced security features, real-time waveform animation, recording timer, and automatic WebM duration fixing
+  - ✨ **New**: Configurable text properties for all UI messages
+  - 🛡️ **Enhanced**: Security features with 2-hour recording limits
+  - 🔧 **Fixed**: Memory leaks and improved error handling
+  - 📦 **Updated**: Dependencies including React Native 0.75.4
+  - 🎵 **Improved**: WebM duration metadata fixing with webm-duration-fix library
 ---
 
 Made with ❤️ for the Mendix Community

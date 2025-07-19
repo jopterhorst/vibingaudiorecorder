@@ -13,6 +13,10 @@ export interface AudioRecorderWidgetContainerProps {
     tabIndex?: number;
     audioContentAttribute: EditableValue<string>;
     onChangeAction?: ActionValue;
+    readyText: string;
+    recordingText: string;
+    processingText: string;
+    completedText: string;
 }
 
 export interface AudioRecorderWidgetPreviewProps {
@@ -28,4 +32,8 @@ export interface AudioRecorderWidgetPreviewProps {
     translate: (text: string) => string;
     audioContentAttribute: string;
     onChangeAction: {} | null;
+    readyText: string;
+    recordingText: string;
+    processingText: string;
+    completedText: string;
 }
