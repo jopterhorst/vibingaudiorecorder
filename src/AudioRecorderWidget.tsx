@@ -26,15 +26,17 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
         readyText,
         recordingText,
         processingText,
-        completedText
+        completedText,
+        maxRecordingMinutes
     } = props;
     const [recording, setRecording] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
     const [waveformData, setWaveformData] = useState<number[]>([]);
     
-    // Security: Maximum recording time in seconds (2 hours)
-    const MAX_RECORDING_TIME = 7200;
+    // Convert minutes to seconds with validation (min: 1 minute, max: 300 minutes = 5 hours)
+    const maxMinutes = Math.max(1, Math.min(300, maxRecordingMinutes || 120));
+    const MAX_RECORDING_TIME = maxMinutes * 60;
     
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -68,7 +70,7 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
                     if (newTime >= MAX_RECORDING_TIME) {
                         debugLog("Maximum recording time reached, stopping automatically");
                         stopRecording();
-                        window.mx?.ui?.info(`Recording stopped automatically after ${MAX_RECORDING_TIME / 60} minutes`);
+                        window.mx?.ui?.info(`Recording stopped automatically after ${maxMinutes} minutes`);
                     }
                     return newTime;
                 });

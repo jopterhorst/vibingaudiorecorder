@@ -15,7 +15,7 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 🔒 **Privacy Focused** - Properly releases microphone access after recording  
 📱 **Browser Compatible** - Works with modern browsers supporting MediaRecorder API  
 🔧 **Duration Fixing** - Automatically fixes WebM duration metadata using webm-duration-fix library  
-⏰ **Recording Limit** - Automatic recording stop after 2 hours for security and performance  
+⏰ **Recording Limit** - Configurable recording time limit (1-300 minutes, default: 2 hours)  
 🛡️ **Security Enhanced** - Production-safe logging and error handling  
 🎨 **Configurable Text** - Customize all UI text messages for different languages and use cases  
 ✨ **Vibe Coded** - This entire widget was crafted with pure vibes and good energy 🌟  
@@ -28,6 +28,8 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 2. **Configure the properties**:
    - **Audio Content Attribute**: Select a string attribute where the base64 audio will be stored
    - **On Change Action**: Select a microflow/nanoflow to execute after recording
+   - **Recording Settings**:
+     - **Max Recording Time**: Set maximum recording duration in minutes (1-300, default: 120)
    - **Text Configuration**: Customize the UI text messages:
      - **Ready Text**: Text shown when ready to record (default: "Press record to start")
      - **Recording Text**: Text shown while recording (default: "Recording in progress...")
@@ -46,6 +48,9 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 Context Object: Services_Integration.VibeFile
 Audio Content Attribute: VibeFile.AudioBase64
 On Change Action: ACT_ProcessAudioFile
+
+Recording Settings:
+Max Recording Time: 30 (minutes - for shorter voice notes)
 
 Text Configuration (optional - customize for your language/use case):
 Ready Text: "Click to start recording"
@@ -115,7 +120,7 @@ Clone this repository and import the widget into your Mendix project to see it i
 - **Storage Format**: Base64 string
 - **File Extension**: `.webm` (must be set manually when creating FileDocument)
 - **File Size**: ~1KB per second (compressed)
-- **Maximum Recording Time**: 2 hours (automatically stops with user notification)
+- **Maximum Recording Time**: Configurable limit (1-300 minutes, default: 120 minutes)
 - **Browser Support**: Chrome, Firefox, Safari, Edge (modern versions with MediaRecorder API)
 - **Format Compatibility**: Excellent compression with good browser support
 - **Permissions**: Requires user consent for microphone access
@@ -135,7 +140,7 @@ Clone this repository and import the widget into your Mendix project to see it i
 
 ## Security Features
 
-🛡️ **Automatic Recording Limits** - Recordings automatically stop after 2 hours to prevent excessive memory usage  
+🛡️ **Configurable Recording Limits** - Set custom maximum recording time (1-300 minutes) to prevent excessive memory usage  
 🔒 **Production-Safe Logging** - Debug logs only appear in development environments  
 🧹 **Memory Management** - Proper cleanup of audio contexts, media streams, and event listeners  
 🎯 **Input Validation** - Validates audio blobs and handles errors gracefully  
@@ -181,12 +186,19 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Version History
 
+## Version History
+
+- **v1.0.1** - Added configurable recording time limit
+  - ✨ **New**: Custom max recording time (1-300 minutes, default: 120 minutes)
+  - 🛡️ **Enhanced**: Recording limits now configurable per widget instance
+  - 📝 **Improved**: Better user notifications with actual configured time limit
 - **v1.0.0** - Initial release with configurable UI text, enhanced security features, real-time waveform animation, recording timer, and automatic WebM duration fixing
   - ✨ **New**: Configurable text properties for all UI messages
   - 🛡️ **Enhanced**: Security features with 2-hour recording limits
   - 🔧 **Fixed**: Memory leaks and improved error handling
   - 📦 **Updated**: Dependencies including React Native 0.75.4
   - 🎵 **Improved**: WebM duration metadata fixing with webm-duration-fix library
+
 ---
 
 Made with ❤️ for the Mendix Community
