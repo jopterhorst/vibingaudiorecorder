@@ -14,7 +14,9 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 🎵 **WebM Format** - High-quality WebM audio recording with Opus codec for optimal compatibility  
 🔒 **Privacy Focused** - Properly releases microphone access after recording  
 📱 **Browser Compatible** - Works with modern browsers supporting MediaRecorder API  
-⚡ **No Dependencies** - Pure implementation without external audio libraries  
+🔧 **Duration Fixing** - Automatically fixes WebM duration metadata using webm-duration-fix library  
+⏰ **Recording Limit** - Automatic recording stop after 2 hours for security and performance  
+🛡️ **Security Enhanced** - Production-safe logging and improved error handling  
 ✨ **Vibe Coded** - This entire widget was crafted with pure vibes and good energy 🌟  
 
 ## Usage
@@ -101,10 +103,14 @@ Clone this repository and import the widget into your Mendix project to see it i
 - **Storage Format**: Base64 string
 - **File Extension**: `.webm` (must be set manually when creating FileDocument)
 - **File Size**: ~1KB per second (compressed)
+- **Maximum Recording Time**: 2 hours (automatically stops with user notification)
 - **Browser Support**: Chrome, Firefox, Safari, Edge (modern versions with MediaRecorder API)
 - **Format Compatibility**: Excellent compression with good browser support
 - **Permissions**: Requires user consent for microphone access
-- **Dependencies**: CommunityCommons module required for base64 to file conversion
+- **Dependencies**: 
+  - CommunityCommons module required for base64 to file conversion
+  - webm-duration-fix library for proper audio duration metadata
+- **Security**: Production-safe logging and automatic recording limits
 
 ## Browser Compatibility
 
@@ -115,6 +121,14 @@ Clone this repository and import the widget into your Mendix project to see it i
 | Safari | ✅ Limited | iOS 14.3+ required |
 | Edge | ✅ Full | Chromium-based versions |
 
+## Security Features
+
+🛡️ **Automatic Recording Limits** - Recordings automatically stop after 2 hours to prevent excessive memory usage  
+🔒 **Production-Safe Logging** - Debug logs only appear in development environments  
+🧹 **Memory Management** - Proper cleanup of audio contexts, media streams, and event listeners  
+🎯 **Input Validation** - Validates audio blobs and handles errors gracefully  
+⚡ **No Vulnerabilities** - All dependencies are regularly updated and audited for security issues
+
 ## Issues, Suggestions and Feature Requests
 
 Found a bug or have a feature request? Please create an issue on our [GitHub Issues page](https://github.com/jopterhorst/vibingaudiorecorder/issues).
@@ -122,18 +136,24 @@ Found a bug or have a feature request? Please create an issue on our [GitHub Iss
 ## Development and Contribution
 
 ### Prerequisites
-- Node.js (v14 or higher)
+- Node.js (v16 or higher)
 - Mendix Studio Pro
 - Git
 
 ### Setup
 1. Clone the repository: `git clone https://github.com/jopterhorst/vibingaudiorecorder.git`
-2. Install dependencies: `npm install` (use `npm install --legacy-peer-deps` for NPM v7+)
+2. Install dependencies: `npm install`
 3. Start development: `npm start` - automatically builds and deploys to test project
 
 ### Building
 - **Development**: `npm start` - watches for changes and auto-builds
 - **Production**: `npm run build` - creates optimized .mpk file in `/dist` folder
+
+### Dependencies
+The widget uses the following key dependencies:
+- `webm-duration-fix` - Fixes WebM audio duration metadata
+- `classnames` - Utility for conditional CSS classes
+- `@mendix/pluggable-widgets-tools` - Mendix widget development tools
 
 ### Contributing
 We welcome contributions! Please:
@@ -150,6 +170,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Version History
 
 - **v1.0.0** - Initial release with modern UI, real-time waveform animation, and recording timer.
+- **v1.1.0** - Added security enhancements:
+  - Automatic recording limit (2 hours)
+  - Production-safe debug logging
+  - WebM duration metadata fixing with webm-duration-fix library
+  - Updated React Native to 0.75.4 for security fixes
+  - Improved error handling and memory management
 
 ---
 

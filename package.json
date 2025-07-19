@@ -31,16 +31,17 @@
     "@types/big.js": "^6.0.2"
   },
   "dependencies": {
-    "classnames": "^2.2.6"
+    "classnames": "^2.2.6",
+    "webm-duration-fix": "^1.0.4"
   },
   "resolutions": {
     "react": "^18.2.0",
     "@types/react": "^18.2.0",
-    "react-native": "0.72.7"
+    "react-native": "0.75.4"
   },
   "overrides": {
     "react": "^18.2.0",
     "@types/react": "^18.2.0",
-    "react-native": "0.72.7"
+    "react-native": "0.75.4"
   }
 }

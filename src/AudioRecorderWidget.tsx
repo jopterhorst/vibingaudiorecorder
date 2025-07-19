@@ -8,13 +8,24 @@ declare global {
 }
 
 import { ReactElement, createElement, useRef, useState, useEffect } from "react";
+import fixWebmDuration from "webm-duration-fix";
 import "./ui/AudioRecorderWidget.css";
+
+// Debug logging helper - only logs in development
+const debugLog = (message: string, ...args: any[]) => {
+    if (process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost') {
+        console.log(`[AudioRecorder] ${message}`, ...args);
+    }
+};
 
 export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: { audioContentAttribute: any; onChangeAction?: any }): ReactElement {
     const [recording, setRecording] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
     const [waveformData, setWaveformData] = useState<number[]>([]);
+    
+    // Security: Maximum recording time in seconds (2 hours)
+    const MAX_RECORDING_TIME = 7200;
     
     const mediaRecorderRef = useRef<MediaRecorder | null>(null);
     const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -42,7 +53,16 @@ export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: {
     useEffect(() => {
         if (recording) {
             timerRef.current = setInterval(() => {
-                setRecordingTime(prev => prev + 1);
+                setRecordingTime(prev => {
+                    const newTime = prev + 1;
+                    // Security: Auto-stop recording if it exceeds maximum time
+                    if (newTime >= MAX_RECORDING_TIME) {
+                        debugLog("Maximum recording time reached, stopping automatically");
+                        stopRecording();
+                        window.mx?.ui?.info(`Recording stopped automatically after ${MAX_RECORDING_TIME / 60} minutes`);
+                    }
+                    return newTime;
+                });
             }, 1000);
         } else {
             if (timerRef.current) {
@@ -109,18 +129,18 @@ export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: {
 
     const startRecording = async () => {
         try {
-            console.log("Starting recording...");
+            debugLog("Starting recording...");
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             mediaStreamRef.current = stream;
             
             // Set up audio context for waveform analysis
             audioContextRef.current = new AudioContext();
-            console.log("Audio context state:", audioContextRef.current.state);
+            debugLog("Audio context state:", audioContextRef.current.state);
             
             // Resume audio context if suspended (required by some browsers)
             if (audioContextRef.current.state === 'suspended') {
                 await audioContextRef.current.resume();
-                console.log("Audio context resumed");
+                debugLog("Audio context resumed");
             }
             
             const source = audioContextRef.current.createMediaStreamSource(stream);
@@ -224,29 +244,20 @@ export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: {
         }
     };
 
-    // Function to fix WebM audio duration metadata
-    const fixAudioDuration = async (audioBlob: Blob, durationSeconds: number): Promise<Blob> => {
+    // Function to fix WebM audio duration metadata using webm-duration-fix
+    const fixAudioDuration = async (audioBlob: Blob): Promise<Blob> => {
         try {
-            console.log(`Debug: Attempting to fix duration for ${durationSeconds}s WebM audio`);
+            console.log(`Debug: Attempting to fix WebM audio duration`);
             console.log(`Debug: Blob type: ${audioBlob.type}, Blob size: ${audioBlob.size}`);
-            
             // Validate input
             if (!audioBlob || audioBlob.size === 0) {
                 console.error("Debug: Invalid or empty audio blob");
                 return audioBlob;
             }
-            
-            if (durationSeconds <= 0) {
-                console.error("Debug: Invalid duration:", durationSeconds);
-                return audioBlob;
-            }
-            
-            // For WebM, we'll just return the original blob since duration metadata 
-            // is complex to modify in WebM containers. The file will play correctly
-            // even if the metadata duration is slightly off.
-            console.log("Debug: Returning WebM blob as-is (duration issues are typically minor in WebM)");
-            return audioBlob;
-            
+            // Use webm-duration-fix to patch the duration in the WebM header
+            const fixedBlob = await fixWebmDuration(audioBlob);
+            console.log("Debug: WebM duration fixed using webm-duration-fix");
+            return fixedBlob;
         } catch (error) {
             console.error("Error in fixAudioDuration:", error);
             return audioBlob; // Return original if fixing fails
@@ -258,77 +269,88 @@ export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: {
 
         try {
             console.log("Debug: Converting audio blob to base64");
-            
+
             // Use the provided duration or fall back to recordingTime
             const durationToUse = actualDurationSeconds ?? recordingTime;
             console.log(`Debug: Using duration: ${durationToUse} seconds (provided: ${actualDurationSeconds}, recordingTime: ${recordingTime})`);
-            
+
             // Fix duration metadata before storing
-            const audioWithDuration = await fixAudioDuration(audioBlob, durationToUse);
-            
+            const audioWithDuration = await fixAudioDuration(audioBlob);
+
             // Convert the fixed audio blob to base64
             const reader = new FileReader();
+            const cleanup = () => {
+                reader.onloadend = null;
+                reader.onerror = null;
+            };
             reader.onloadend = () => {
-                const base64String = reader.result as string;
-                // Remove the data URL prefix (e.g., "data:audio/webm;base64,")
-                const base64Content = base64String.split(',')[1];
-                
-                console.log("Debug: Base64 conversion complete, length:", base64Content.length);
-                console.log("Debug: Recording duration was:", durationToUse, "seconds");
-                
-                // Store the base64 content in the attribute
-                if (audioContentAttribute && audioContentAttribute.setValue) {
-                    audioContentAttribute.setValue(base64Content);
-                    console.log("Debug: Base64 content stored in attribute");
-                    
-                    // Trigger the onChange action
-                    console.log("Debug: onChangeAction object:", onChangeAction);
-                    if (onChangeAction) {
-                        if (typeof onChangeAction === 'function') {
-                            console.log("Debug: onChangeAction is a function, calling directly");
-                            onChangeAction();
-                        } else if (onChangeAction.execute && typeof onChangeAction.execute === 'function') {
-                            console.log("Debug: Calling onChangeAction.execute()");
-                            onChangeAction.execute();
-                        } else if (onChangeAction.get && typeof onChangeAction.get === 'function') {
-                            console.log("Debug: Calling onChangeAction.get().execute()");
-                            const action = onChangeAction.get();
-                            if (action && action.execute) {
-                                action.execute();
+                try {
+                    const base64String = reader.result as string;
+                    // Remove the data URL prefix (e.g., "data:audio/webm;base64,")
+                    const base64Content = base64String.split(',')[1];
+
+                    console.log("Debug: Base64 conversion complete, length:", base64Content.length);
+                    console.log("Debug: Recording duration was:", durationToUse, "seconds");
+
+                    // Store the base64 content in the attribute
+                    if (audioContentAttribute && audioContentAttribute.setValue) {
+                        audioContentAttribute.setValue(base64Content);
+                        console.log("Debug: Base64 content stored in attribute");
+
+                        // Trigger the onChange action
+                        console.log("Debug: onChangeAction object:", onChangeAction);
+                        if (onChangeAction) {
+                            if (typeof onChangeAction === 'function') {
+                                console.log("Debug: onChangeAction is a function, calling directly");
+                                onChangeAction();
+                            } else if (onChangeAction.execute && typeof onChangeAction.execute === 'function') {
+                                console.log("Debug: Calling onChangeAction.execute()");
+                                onChangeAction.execute();
+                            } else if (onChangeAction.get && typeof onChangeAction.get === 'function') {
+                                console.log("Debug: Calling onChangeAction.get().execute()");
+                                const action = onChangeAction.get();
+                                if (action && action.execute) {
+                                    action.execute();
+                                }
+                            } else {
+                                console.log("Debug: onChangeAction structure:", Object.keys(onChangeAction || {}));
+                                console.log("Debug: Trying to call onChangeAction directly as function");
+                                try {
+                                    onChangeAction();
+                                } catch (e) {
+                                    console.error("Debug: Failed to call onChangeAction:", e);
+                                }
                             }
                         } else {
-                            console.log("Debug: onChangeAction structure:", Object.keys(onChangeAction || {}));
-                            console.log("Debug: Trying to call onChangeAction directly as function");
-                            try {
-                                onChangeAction();
-                            } catch (e) {
-                                console.error("Debug: Failed to call onChangeAction:", e);
-                            }
+                            console.log("Debug: No onChangeAction provided");
                         }
+
+                        // Success - no popup message
+                        console.log("Debug: Audio recording completed successfully");
                     } else {
-                        console.log("Debug: No onChangeAction provided");
+                        console.error("Audio content attribute is not available or doesn't have setValue method");
+                        console.log("Debug: audioContentAttribute:", audioContentAttribute);
+                        window.mx.ui.error("Failed to store audio content - no attribute available");
                     }
-                    
-                    // Success - no popup message
-                    console.log("Debug: Audio recording completed successfully");
-                } else {
-                    console.error("Audio content attribute is not available or doesn't have setValue method");
-                    console.log("Debug: audioContentAttribute:", audioContentAttribute);
-                    window.mx.ui.error("Failed to store audio content - no attribute available");
+                } finally {
+                    setUploading(false);
+                    cleanup();
                 }
-                
-                setUploading(false);
             };
-            
+
             reader.onerror = () => {
-                console.error("Failed to convert audio to base64");
-                window.mx.ui.error("Failed to convert audio to base64");
-                setUploading(false);
+                try {
+                    console.error("Failed to convert audio to base64");
+                    window.mx.ui.error("Failed to convert audio to base64");
+                } finally {
+                    setUploading(false);
+                    cleanup();
+                }
             };
-            
+
             // Start the conversion with the fixed audio
             reader.readAsDataURL(audioWithDuration);
-            
+
         } catch (error) {
             console.error("Store process error:", error);
             window.mx.ui.error("Store failed: " + error);
