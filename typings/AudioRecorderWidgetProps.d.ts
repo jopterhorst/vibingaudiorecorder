@@ -14,6 +14,7 @@ export interface AudioRecorderWidgetContainerProps {
     audioContentAttribute: EditableValue<string>;
     onChangeAction?: ActionValue;
     maxRecordingMinutes: number;
+    waveformColor: string;
     readyText: string;
     recordingText: string;
     processingText: string;
@@ -34,6 +35,7 @@ export interface AudioRecorderWidgetPreviewProps {
     audioContentAttribute: string;
     onChangeAction: {} | null;
     maxRecordingMinutes: number | null;
+    waveformColor: string;
     readyText: string;
     recordingText: string;
     processingText: string;

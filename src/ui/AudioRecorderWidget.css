@@ -93,7 +93,7 @@
 
 .waveform-bar {
     width: 3px;
-    background: rgba(255, 255, 255, 0.4);
+    background: var(--waveform-inactive-color, rgba(255, 255, 255, 0.4));
     border-radius: 2px;
     transition: all 0.1s ease-out;
     min-height: 4px;
@@ -101,15 +101,15 @@
 }
 
 .waveform-bar.active {
-    background: linear-gradient(to top, #00ff88, #00cc6a);
-    box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+    background: var(--waveform-active-color, linear-gradient(to top, #00ff88, #00cc6a));
+    box-shadow: 0 0 12px var(--waveform-glow-color, rgba(0, 255, 136, 0.6));
     animation: glow 0.3s ease-out;
 }
 
 @keyframes glow {
-    0% { box-shadow: 0 0 5px rgba(0, 255, 136, 0.3); }
-    50% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.8); }
-    100% { box-shadow: 0 0 12px rgba(0, 255, 136, 0.6); }
+    0% { box-shadow: 0 0 5px var(--waveform-glow-color, rgba(0, 255, 136, 0.3)); }
+    50% { box-shadow: 0 0 20px var(--waveform-glow-color, rgba(0, 255, 136, 0.8)); }
+    100% { box-shadow: 0 0 12px var(--waveform-glow-color, rgba(0, 255, 136, 0.6)); }
 }
 
 .control-buttons {

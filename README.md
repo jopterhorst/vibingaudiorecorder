@@ -18,6 +18,7 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 ⏰ **Recording Limit** - Configurable recording time limit (1-300 minutes, default: 2 hours)  
 🛡️ **Security Enhanced** - Production-safe logging and error handling  
 🎨 **Configurable Text** - Customize all UI text messages for different languages and use cases  
+🌈 **Custom Waveform Colors** - Personalize waveform appearance with any hex color  
 ✨ **Vibe Coded** - This entire widget was crafted with pure vibes and good energy 🌟  
 
 ## Usage
@@ -30,6 +31,7 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
    - **On Change Action**: Select a microflow/nanoflow to execute after recording
    - **Recording Settings**:
      - **Max Recording Time**: Set maximum recording duration in minutes (1-300, default: 120)
+     - **Waveform Color**: Customize waveform appearance with hex color (default: #4facfe)
    - **Text Configuration**: Customize the UI text messages:
      - **Ready Text**: Text shown when ready to record (default: "Press record to start")
      - **Recording Text**: Text shown while recording (default: "Recording in progress...")
@@ -51,6 +53,7 @@ On Change Action: ACT_ProcessAudioFile
 
 Recording Settings:
 Max Recording Time: 30 (minutes - for shorter voice notes)
+Waveform Color: #ff6b6b (red theme to match app branding)
 
 Text Configuration (optional - customize for your language/use case):
 Ready Text: "Click to start recording"
@@ -145,6 +148,7 @@ Clone this repository and import the widget into your Mendix project to see it i
 🧹 **Memory Management** - Proper cleanup of audio contexts, media streams, and event listeners  
 🎯 **Input Validation** - Validates audio blobs and handles errors gracefully  
 🌐 **Customizable UI Text** - All user-facing text can be configured for localization and branding  
+🎨 **Custom Waveform Colors** - Personalize waveform appearance to match your app's theme  
 
 ## Issues, Suggestions and Feature Requests
 
@@ -186,7 +190,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Version History
 
-- **v1.0.0** - Initial release with configurable UI text, enhanced security features, real-time waveform animation, recording timer, and automatic WebM duration fixing
+- **v1.0.0** - Comprehensive audio recorder with configurable features
+  - � **Core**: Direct microphone recording with WebM format and Opus codec
+  - � **Customization**: Configurable UI text and waveform colors
+  - ⏰ **Flexibility**: Configurable recording time limits (1-300 minutes)
+  - 🌊 **Visualization**: Real-time waveform animation with custom colors
+  - �️ **Security**: Production-safe logging and automatic recording limits
+  - 🔧 **Integration**: Base64 storage with onChange action support
+  - 📦 **Dependencies**: Enhanced with webm-duration-fix and security updates
 
 ---
 

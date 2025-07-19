@@ -27,6 +27,10 @@
                 <caption>Max Recording Time (minutes)</caption>
                 <description>Maximum recording duration in minutes (1-300, default: 120)</description>
             </property>
+            <property key="waveformColor" type="string" required="false" defaultValue="#4facfe">
+                <caption>Waveform Color</caption>
+                <description>Hex color for waveform bars (e.g., #4facfe, #ff6b6b, #51cf66)</description>
+            </property>
         </propertyGroup>
         <propertyGroup caption="Text Configuration">
             <property key="readyText" type="string" required="false" defaultValue="Press record to start">

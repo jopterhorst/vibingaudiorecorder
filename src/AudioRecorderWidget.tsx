@@ -19,6 +19,41 @@ const debugLog = (message: string, ...args: any[]) => {
     }
 };
 
+// Color utility functions for waveform styling
+const hexToRgb = (hex: string): { r: number; g: number; b: number } | null => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+        r: parseInt(result[1], 16),
+        g: parseInt(result[2], 16),
+        b: parseInt(result[3], 16)
+    } : null;
+};
+
+const generateWaveformColors = (baseColor: string) => {
+    const rgb = hexToRgb(baseColor);
+    if (!rgb) {
+        // Fallback to default colors if invalid hex
+        return {
+            inactive: "rgba(255, 255, 255, 0.4)",
+            active: "linear-gradient(to top, #00ff88, #00cc6a)",
+            glow: "rgba(0, 255, 136, 0.6)"
+        };
+    }
+
+    const { r, g, b } = rgb;
+    
+    // Create gradient colors by adjusting brightness
+    const lighterR = Math.min(255, Math.floor(r * 1.3));
+    const lighterG = Math.min(255, Math.floor(g * 1.3));
+    const lighterB = Math.min(255, Math.floor(b * 1.3));
+    
+    return {
+        inactive: `rgba(${r}, ${g}, ${b}, 0.4)`,
+        active: `linear-gradient(to top, ${baseColor}, rgb(${lighterR}, ${lighterG}, ${lighterB}))`,
+        glow: `rgba(${r}, ${g}, ${b}, 0.6)`
+    };
+};
+
 export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): ReactElement {
     const { 
         audioContentAttribute, 
@@ -27,7 +62,8 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
         recordingText,
         processingText,
         completedText,
-        maxRecordingMinutes
+        maxRecordingMinutes,
+        waveformColor
     } = props;
     const [recording, setRecording] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -350,8 +386,18 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
         }
     };
 
+    // Generate waveform colors based on user configuration
+    const waveformColors = generateWaveformColors(waveformColor || "#4facfe");
+
     return (
-        <div className="audio-recorder-container">
+        <div 
+            className="audio-recorder-container"
+            style={{
+                "--waveform-inactive-color": waveformColors.inactive,
+                "--waveform-active-color": waveformColors.active,
+                "--waveform-glow-color": waveformColors.glow
+            } as React.CSSProperties}
+        >
             <div className="control-row">
                 <div className="timer-display">
                     {formatTime(recordingTime)}

@@ -2,7 +2,7 @@
   "name": "audiorecorderwidget",
   "widgetName": "AudioRecorderWidget",
   "version": "1.0.0",
-  "description": "Modern audio recorder widget with waveform animation and timer for Mendix apps",
+  "description": "Modern audio recorder widget with configurable waveform colors, recording time limits, and customizable UI text for Mendix apps",
   "copyright": "© Mendix Technology BV 2025. All rights reserved.",
   "author": "Jop ter Horst",
   "engines": {
