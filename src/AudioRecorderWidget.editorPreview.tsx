@@ -21,12 +21,12 @@ export class preview extends Component<AudioRecorderWidgetPreviewProps> {
                     
                     <div className="waveform-container">
                         <div className="waveform-placeholder">
-                            Press record to start
+                            {this.props.readyText}
                         </div>
                     </div>
 
                     <div className="status-text">
-                        Ready to record WEBM
+                        {this.props.readyText}
                     </div>
                 </div>
             </div>
