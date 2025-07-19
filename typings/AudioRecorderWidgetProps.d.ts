@@ -13,7 +13,7 @@ export interface AudioRecorderWidgetContainerProps {
     tabIndex?: number;
     audioContentAttribute: EditableValue<string>;
     onChangeAction?: ActionValue;
-    maxRecordingMinutes?: number;
+    maxRecordingMinutes: number;
     readyText: string;
     recordingText: string;
     processingText: string;

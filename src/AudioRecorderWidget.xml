@@ -23,7 +23,7 @@
             </property>
         </propertyGroup>
         <propertyGroup caption="Recording Settings">
-            <property key="maxRecordingMinutes" type="integer" required="false" defaultValue="120">
+            <property key="maxRecordingMinutes" type="integer" required="true" defaultValue="120">
                 <caption>Max Recording Time (minutes)</caption>
                 <description>Maximum recording duration in minutes (1-300, default: 120)</description>
             </property>
