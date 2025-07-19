@@ -15,14 +15,6 @@
                     <attributeType name="String"/>
                 </attributeTypes>
             </property>
-            <property key="audioFormat" type="enumeration" defaultValue="webm">
-                <caption>Audio Format</caption>
-                <description>Choose the audio format for recording</description>
-                <enumerationValues>
-                    <enumerationValue key="webm">WebM (Recommended - smaller files)</enumerationValue>
-                    <enumerationValue key="wav">WAV (Larger files, better compatibility)</enumerationValue>
-                </enumerationValues>
-            </property>
         </propertyGroup>
         <propertyGroup caption="Events">
             <property key="onChangeAction" type="action" required="false">

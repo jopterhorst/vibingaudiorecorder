@@ -6,15 +6,12 @@
 import { CSSProperties } from "react";
 import { ActionValue, EditableValue } from "mendix";
 
-export type AudioFormatEnum = "webm" | "wav";
-
 export interface AudioRecorderWidgetContainerProps {
     name: string;
     class: string;
     style?: CSSProperties;
     tabIndex?: number;
     audioContentAttribute: EditableValue<string>;
-    audioFormat: AudioFormatEnum;
     onChangeAction?: ActionValue;
 }
 
@@ -29,6 +26,5 @@ export interface AudioRecorderWidgetPreviewProps {
     readOnly: boolean;
     renderMode?: "design" | "xray" | "structure";
     audioContentAttribute: string;
-    audioFormat: AudioFormatEnum;
     onChangeAction: {} | null;
 }

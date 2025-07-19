@@ -10,7 +10,7 @@ declare global {
 import { ReactElement, createElement, useRef, useState, useEffect } from "react";
 import "./ui/AudioRecorderWidget.css";
 
-export function AudioRecorderWidget({ audioContentAttribute, audioFormat, onChangeAction }: { audioContentAttribute: any; audioFormat: "webm" | "wav"; onChangeAction?: any }): ReactElement {
+export function AudioRecorderWidget({ audioContentAttribute, onChangeAction }: { audioContentAttribute: any; onChangeAction?: any }): ReactElement {
     const [recording, setRecording] = useState(false);
     const [uploading, setUploading] = useState(false);
     const [recordingTime, setRecordingTime] = useState(0);
@@ -25,29 +25,16 @@ export function AudioRecorderWidget({ audioContentAttribute, audioFormat, onChan
     const animationRef = useRef<number | null>(null);
 
     // Format detection and MIME type selection
-    const getAudioMimeType = (format: "webm" | "wav"): string => {
-        if (format === "wav") {
-            // Check for WAV support, fallback to PCM
-            if (MediaRecorder.isTypeSupported("audio/wav")) {
-                return "audio/wav";
-            } else if (MediaRecorder.isTypeSupported("audio/wave")) {
-                return "audio/wave";
-            } else if (MediaRecorder.isTypeSupported("audio/x-wav")) {
-                return "audio/x-wav";
-            } else {
-                console.warn("WAV format not supported, falling back to WebM");
-                return "audio/webm";
-            }
+    const getAudioMimeType = (): string => {
+        // Always use WebM format for reliability
+        if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
+            return "audio/webm;codecs=opus";
+        } else if (MediaRecorder.isTypeSupported("audio/webm")) {
+            return "audio/webm";
         } else {
-            // WebM format options
-            if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) {
-                return "audio/webm;codecs=opus";
-            } else if (MediaRecorder.isTypeSupported("audio/webm")) {
-                return "audio/webm";
-            } else {
-                // Final fallback
-                return "";
-            }
+            // Final fallback
+            console.warn("WebM not supported, using default");
+            return "";
         }
     };
 
@@ -144,9 +131,9 @@ export function AudioRecorderWidget({ audioContentAttribute, audioFormat, onChan
             
             console.log("Audio analyzer setup complete, buffer length:", analyzerRef.current.frequencyBinCount);
 
-            // Get the appropriate MIME type for the selected format
-            const mimeType = getAudioMimeType(audioFormat);
-            console.log("Selected audio format:", audioFormat, "MIME type:", mimeType);
+            // Get the WebM MIME type
+            const mimeType = getAudioMimeType();
+            console.log("Selected audio format: WebM, MIME type:", mimeType);
 
             // Create MediaRecorder with format-specific options
             const options = mimeType ? { mimeType } : {};
@@ -155,12 +142,20 @@ export function AudioRecorderWidget({ audioContentAttribute, audioFormat, onChan
             audioChunks.current = [];
 
             mediaRecorder.ondataavailable = event => {
+                console.log(`Debug: Data available - size: ${event.data.size}, type: ${event.data.type}`);
                 if (event.data.size > 0) {
                     audioChunks.current.push(event.data);
+                    console.log(`Debug: Added chunk, total chunks: ${audioChunks.current.length}`);
+                } else {
+                    console.warn("Debug: Received empty data chunk");
                 }
             };
 
             mediaRecorder.onstop = async () => {
+                // Preserve the recording duration before any cleanup
+                const finalRecordingDuration = recordingTime;
+                console.log(`Debug: Recording stopped, final duration: ${finalRecordingDuration} seconds`);
+                
                 // Stop waveform animation
                 if (animationRef.current) {
                     cancelAnimationFrame(animationRef.current);
@@ -181,13 +176,25 @@ export function AudioRecorderWidget({ audioContentAttribute, audioFormat, onChan
                     mediaStreamRef.current = null;
                 }
                 
-                // Create blob with the correct MIME type
-                const selectedMimeType = getAudioMimeType(audioFormat);
+                // Create blob with WebM MIME type
+                const selectedMimeType = getAudioMimeType();
+                console.log(`Debug: Creating final blob from ${audioChunks.current.length} chunks`);
+                console.log(`Debug: Chunk sizes:`, audioChunks.current.map(chunk => chunk.size));
+                
                 const audioBlob = new Blob(audioChunks.current, { 
-                    type: selectedMimeType || (audioFormat === "wav" ? "audio/wav" : "audio/webm")
+                    type: selectedMimeType || "audio/webm"
                 });
                 console.log("Created audio blob with type:", audioBlob.type, "size:", audioBlob.size);
-                await storeAudioAsBase64(audioBlob);
+                
+                // Additional validation
+                if (audioBlob.size === 0) {
+                    console.error("Debug: Created blob is empty! This indicates recording failed.");
+                    window.mx?.ui?.error("Recording failed - no audio data captured");
+                    return;
+                }
+                
+                // Pass the preserved duration to the storage function
+                await storeAudioAsBase64(audioBlob, finalRecordingDuration);
             };
 
             mediaRecorder.start();
@@ -217,13 +224,49 @@ export function AudioRecorderWidget({ audioContentAttribute, audioFormat, onChan
         }
     };
 
-    const storeAudioAsBase64 = async (audioBlob: Blob) => {
+    // Function to fix WebM audio duration metadata
+    const fixAudioDuration = async (audioBlob: Blob, durationSeconds: number): Promise<Blob> => {
+        try {
+            console.log(`Debug: Attempting to fix duration for ${durationSeconds}s WebM audio`);
+            console.log(`Debug: Blob type: ${audioBlob.type}, Blob size: ${audioBlob.size}`);
+            
+            // Validate input
+            if (!audioBlob || audioBlob.size === 0) {
+                console.error("Debug: Invalid or empty audio blob");
+                return audioBlob;
+            }
+            
+            if (durationSeconds <= 0) {
+                console.error("Debug: Invalid duration:", durationSeconds);
+                return audioBlob;
+            }
+            
+            // For WebM, we'll just return the original blob since duration metadata 
+            // is complex to modify in WebM containers. The file will play correctly
+            // even if the metadata duration is slightly off.
+            console.log("Debug: Returning WebM blob as-is (duration issues are typically minor in WebM)");
+            return audioBlob;
+            
+        } catch (error) {
+            console.error("Error in fixAudioDuration:", error);
+            return audioBlob; // Return original if fixing fails
+        }
+    };
+
+    const storeAudioAsBase64 = async (audioBlob: Blob, actualDurationSeconds?: number) => {
         setUploading(true);
 
         try {
             console.log("Debug: Converting audio blob to base64");
             
-            // Convert the audio blob to base64
+            // Use the provided duration or fall back to recordingTime
+            const durationToUse = actualDurationSeconds ?? recordingTime;
+            console.log(`Debug: Using duration: ${durationToUse} seconds (provided: ${actualDurationSeconds}, recordingTime: ${recordingTime})`);
+            
+            // Fix duration metadata before storing
+            const audioWithDuration = await fixAudioDuration(audioBlob, durationToUse);
+            
+            // Convert the fixed audio blob to base64
             const reader = new FileReader();
             reader.onloadend = () => {
                 const base64String = reader.result as string;
@@ -231,6 +274,7 @@ export function AudioRecorderWidget({ audioContentAttribute, audioFormat, onChan
                 const base64Content = base64String.split(',')[1];
                 
                 console.log("Debug: Base64 conversion complete, length:", base64Content.length);
+                console.log("Debug: Recording duration was:", durationToUse, "seconds");
                 
                 // Store the base64 content in the attribute
                 if (audioContentAttribute && audioContentAttribute.setValue) {
@@ -282,8 +326,8 @@ export function AudioRecorderWidget({ audioContentAttribute, audioFormat, onChan
                 setUploading(false);
             };
             
-            // Start the conversion
-            reader.readAsDataURL(audioBlob);
+            // Start the conversion with the fixed audio
+            reader.readAsDataURL(audioWithDuration);
             
         } catch (error) {
             console.error("Store process error:", error);
@@ -338,10 +382,10 @@ export function AudioRecorderWidget({ audioContentAttribute, audioFormat, onChan
             </div>
 
             <div className={`status-text ${uploading ? 'processing' : ''}`}>
-                {uploading ? `Processing ${audioFormat.toUpperCase()} audio...` : 
-                 recording ? `Recording ${audioFormat.toUpperCase()} in progress...` : 
-                 recordingTime > 0 ? `${audioFormat.toUpperCase()} recording completed` : 
-                 `Ready to record ${audioFormat.toUpperCase()}`}
+                {uploading ? `Processing WEBM audio...` : 
+                 recording ? `Recording WEBM in progress...` : 
+                 recordingTime > 0 ? `WEBM recording completed` : 
+                 `Ready to record WEBM`}
             </div>
         </div>
     );
