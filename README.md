@@ -149,7 +149,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Version History
 
-- **v1.0.0** - Initial release with modern UI, real-time waveform animation, recording timer, and dual-format support (WebM/WAV)
+- **v1.0.0** - Initial release with modern UI, real-time waveform animation, and recording timer.
 
 ---
 
