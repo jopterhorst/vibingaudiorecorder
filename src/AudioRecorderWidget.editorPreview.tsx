@@ -3,8 +3,6 @@ import { AudioRecorderWidgetPreviewProps } from "../typings/AudioRecorderWidgetP
 
 export class preview extends Component<AudioRecorderWidgetPreviewProps> {
     render(): ReactNode {
-        const selectedFormat = this.props.audioFormat || "webm";
-        
         return (
             <div className={this.props.className} style={this.props.styleObject}>
                 <div className="audio-recorder-container">
@@ -28,7 +26,7 @@ export class preview extends Component<AudioRecorderWidgetPreviewProps> {
                     </div>
 
                     <div className="status-text">
-                        Ready to record {selectedFormat.toUpperCase()}
+                        Ready to record WEBM
                     </div>
                 </div>
             </div>
