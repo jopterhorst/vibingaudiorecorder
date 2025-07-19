@@ -186,18 +186,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Version History
 
-## Version History
-
-- **v1.0.1** - Added configurable recording time limit
-  - ✨ **New**: Custom max recording time (1-300 minutes, default: 120 minutes)
-  - 🛡️ **Enhanced**: Recording limits now configurable per widget instance
-  - 📝 **Improved**: Better user notifications with actual configured time limit
 - **v1.0.0** - Initial release with configurable UI text, enhanced security features, real-time waveform animation, recording timer, and automatic WebM duration fixing
-  - ✨ **New**: Configurable text properties for all UI messages
-  - 🛡️ **Enhanced**: Security features with 2-hour recording limits
-  - 🔧 **Fixed**: Memory leaks and improved error handling
-  - 📦 **Updated**: Dependencies including React Native 0.75.4
-  - 🎵 **Improved**: WebM duration metadata fixing with webm-duration-fix library
 
 ---
 
