@@ -1,6 +1,241 @@
-/*
-Place your custom CSS here
-*/
-.widget-hello-world {
+/* Modern Audio Recorder Widget Styles */
+.audio-recorder-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    min-width: 240px;
+    max-width: 280px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    position: relative;
+    overflow: hidden;
+}
 
+.audio-recorder-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(255, 255, 255, 0.05) 100%);
+    pointer-events: none;
+}
+
+.recorder-header {
+    text-align: center;
+    margin-bottom: 12px;
+    z-index: 1;
+    display: none; /* Hidden by default */
+}
+
+.recorder-title {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.control-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 16px;
+    z-index: 1;
+}
+
+.timer-display {
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 24px;
+    font-weight: 300;
+    font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', Consolas, monospace;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 1px;
+    z-index: 1;
+    min-width: 60px;
+}
+
+.waveform-container {
+    width: 220px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    margin: 8px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 1;
+}
+
+.waveform {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: 2px;
+    padding: 0 20px;
+    width: 100%;
+    justify-content: center;
+}
+
+.waveform-bar {
+    width: 3px;
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 2px;
+    transition: all 0.1s ease-out;
+    min-height: 4px;
+    transform-origin: bottom;
+}
+
+.waveform-bar.active {
+    background: linear-gradient(to top, #00ff88, #00cc6a);
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.6);
+    animation: glow 0.3s ease-out;
+}
+
+@keyframes glow {
+    0% { box-shadow: 0 0 5px rgba(0, 255, 136, 0.3); }
+    50% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.8); }
+    100% { box-shadow: 0 0 12px rgba(0, 255, 136, 0.6); }
+}
+
+.control-buttons {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    z-index: 1;
+}
+
+.record-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+}
+
+.record-button:not(.recording) {
+    background: linear-gradient(135deg, #ff4757, #ff3838);
+    box-shadow: 0 8px 32px rgba(255, 71, 87, 0.4);
+}
+
+.record-button.recording {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+    animation: recordingPulse 2s infinite;
+}
+
+.record-button:hover:not(:disabled) {
+    transform: scale(1.08);
+    box-shadow: 0 12px 40px rgba(255, 71, 87, 0.6);
+}
+
+.record-button:active:not(:disabled) {
+    transform: scale(0.95);
+}
+
+.record-button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+@keyframes recordingPulse {
+    0%, 100% { 
+        box-shadow: 0 8px 32px rgba(255, 71, 87, 0.4);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 8px 40px rgba(255, 71, 87, 0.8);
+        transform: scale(1.02);
+    }
+}
+
+.record-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: white;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.record-icon.recording {
+    border-radius: 4px;
+    width: 16px;
+    height: 16px;
+    animation: iconPulse 1s infinite alternate;
+}
+
+@keyframes iconPulse {
+    0% { opacity: 1; }
+    100% { opacity: 0.7; }
+}
+
+.status-text {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 14px;
+    margin-top: 16px;
+    text-align: center;
+    min-height: 20px;
+    font-weight: 500;
+    z-index: 1;
+}
+
+.status-text.processing {
+    color: #00ff88;
+    animation: fadeInOut 1.5s infinite;
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+}
+
+.waveform-placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+    text-align: center;
+    font-style: italic;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .audio-recorder-container {
+        min-width: 220px;
+        padding: 10px;
+    }
+    
+    .waveform-container {
+        width: 200px;
+        height: 45px;
+    }
+    
+    .timer-display {
+        font-size: 20px;
+    }
+    
+    .record-button {
+        width: 50px;
+        height: 50px;
+    }
 }

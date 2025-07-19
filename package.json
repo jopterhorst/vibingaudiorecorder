@@ -1,8 +1,8 @@
 {
   "name": "audiorecorderwidget",
   "widgetName": "AudioRecorderWidget",
-  "version": "1.0.1",
-  "description": "Widget to record audio from the microphone and store it in a Mendix app",
+  "version": "1.0.0",
+  "description": "Modern audio recorder widget with waveform animation and timer for Mendix apps",
   "copyright": "© Mendix Technology BV 2025. All rights reserved.",
   "author": "Jop ter Horst",
   "engines": {
@@ -19,7 +19,7 @@
     "start": "pluggable-widgets-tools start:server",
     "dev": "pluggable-widgets-tools start:web",
     "build": "pluggable-widgets-tools build:web",
-    "postbuild": "xcopy /Y dist\\1.0.1\\*.mpk \"C:\\Mendix\\Upstream YouTube-main\\widgets\\\" 2>nul || echo Build complete, .mpk file copied to Mendix project",
+    "postbuild": "xcopy /Y dist\\1.0.0\\*.mpk \"C:\\Mendix\\Upstream YouTube-main\\widgets\\\" 2>nul || echo Build complete, .mpk file copied to Mendix project",
     "deploy": "npm run build",
     "lint": "pluggable-widgets-tools lint",
     "lint:fix": "pluggable-widgets-tools lint:fix",

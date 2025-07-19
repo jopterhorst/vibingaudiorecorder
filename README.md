@@ -8,7 +8,9 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 📝 **Base64 Conversion** - Automatically converts recorded audio to base64 format for easy storage  
 💾 **Flexible Storage** - Store audio in any string attribute of your context object  
 🔧 **Action Integration** - Trigger custom microflows/nanoflows after recording completes  
-🎯 **Clean UI** - Simple record/stop interface with processing feedback  
+🎯 **Modern UI** - Beautiful gradient design with real-time waveform visualization  
+⏱️ **Built-in Timer** - Shows recording duration in MM:SS format  
+🌊 **Live Waveform** - Real-time audio waveform animation that responds to sound levels  
 🔒 **Privacy Focused** - Properly releases microphone access after recording  
 📱 **Browser Compatible** - Works with modern browsers supporting MediaRecorder API  
 ⚡ **No Dependencies** - Pure implementation without external audio libraries  
@@ -20,7 +22,7 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 1. **Add the widget** to any page with an object as context (e.g., Customer, Order, Document, etc.)
 2. **Configure the properties**:
    - **Audio Content Attribute**: Select a string attribute where the base64 audio will be stored
-   - **On Change Action**: (Optional) Select a microflow/nanoflow to execute after recording
+   - **On Change Action**: Select a microflow/nanoflow to execute after recording
 3. **Recording workflow**:
    - User clicks "Record" → microphone access requested and recording starts
    - User clicks "Stop Recording" → recording stops and processing begins
@@ -38,18 +40,55 @@ On Change Action: ACT_ProcessAudioFile
 
 ### Processing Audio Data
 
-After recording, you can access the base64 audio data in your microflows:
+After recording, you can access the base64 audio data in your microflows and convert it to a file:
+
+#### Required Module
+First, download and import the **CommunityCommons** module from the Mendix Marketplace, which provides the necessary file conversion actions.
+
+#### Step-by-Step File Conversion
 
 ```
-Input Parameter: $VibeFile (or your entity)
+Input Parameter: $VibeFile (or your entity with the base64 audio data)
 Audio Data: $VibeFile/AudioBase64
 
-// Example processing:
-// 1. Convert base64 to binary using Java actions
-// 2. Create FileDocument with proper file extension
-// 3. Set metadata (name, size, creation date)
-// 4. Save to database or trigger additional workflows
+// Step 1: Convert base64 to FileDocument using CommunityCommons
+// Use the "Base64DecodeToFile" action from CommunityCommons module
+// - Input: $VibeFile/AudioBase64 (the base64 string)
+// - Input: A FileDocument to be filled
+// - Output: FileDocument with the audio content
+
+// Step 2: Set the file extension manually to .webm
+// The widget records in WebM format, so you need to add the .webm extension
+// Set the FileDocument.Name to something like: "recording_" + currentDateTime + ".webm"
+
+// Step 3: Save and use the FileDocument
+// Now you have a proper FileDocument that can be:
+// - Downloaded by users
+// - Stored in your database
+// - Used in other microflows
+// - Played back using HTML5 audio players
 ```
+
+#### Example Microflow Steps
+
+1. **Create a FileDocument object**
+   - Return: `$NewFileDocument`
+
+2. **Call CommunityCommons.Base64DecodeToFile**
+   - Parameter 1: `$VibeFile/AudioBase64`
+   - Parameter 2: `$NewFileDocument`
+   - Return: `Boolean`
+
+3. **Change Object** (set file properties)
+   - Object: `$NewFileDocument`
+   - Set `Name` to: `'recording_' + toString([%CurrentDateTime%]) + '.webm'`
+   - Set other properties as needed
+
+5. **Commit Object**
+   - Object: `$NewFileDocument`
+
+6. **Further Processing** (optional)
+   - Download file, send via email, store in cloud, etc.
 
 ## Demo Project
 
@@ -59,9 +98,11 @@ Clone this repository and import the widget into your Mendix project to see it i
 
 - **Audio Format**: WebM (browser-dependent, typically WebM with Opus codec)
 - **Storage Format**: Base64 string
+- **File Extension**: `.webm` (must be set manually when creating FileDocument)
 - **File Size**: Varies by recording length and quality (typically ~1KB per second)
 - **Browser Support**: Chrome, Firefox, Safari, Edge (modern versions with MediaRecorder API)
 - **Permissions**: Requires user consent for microphone access
+- **Dependencies**: CommunityCommons module required for base64 to file conversion
 
 ## Browser Compatibility
 
@@ -106,8 +147,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Version History
 
-- **v1.0.0** - Initial release with core recording functionality
-- **v1.0.1** - Fixed microphone access cleanup after recording
+- **v1.0.0** - Initial release with modern UI, real-time waveform animation, recording timer, and CommunityCommons integration
 
 ---
 
