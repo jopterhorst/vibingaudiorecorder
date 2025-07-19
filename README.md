@@ -11,9 +11,11 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 🎯 **Modern UI** - Beautiful gradient design with real-time waveform visualization  
 ⏱️ **Built-in Timer** - Shows recording duration in MM:SS format  
 🌊 **Live Waveform** - Real-time audio waveform animation that responds to sound levels  
+🎵 **Dual Format Support** - Choose between WebM (compressed, smaller files) or WAV (uncompressed, better compatibility)  
 🔒 **Privacy Focused** - Properly releases microphone access after recording  
 📱 **Browser Compatible** - Works with modern browsers supporting MediaRecorder API  
 ⚡ **No Dependencies** - Pure implementation without external audio libraries  
+✨ **Vibe Coded** - This entire widget was crafted with pure vibes and good energy 🌟  
 
 ## Usage
 
