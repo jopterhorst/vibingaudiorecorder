@@ -22,6 +22,7 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 1. **Add the widget** to any page with an object as context (e.g., Customer, Order, Document, etc.)
 2. **Configure the properties**:
    - **Audio Content Attribute**: Select a string attribute where the base64 audio will be stored
+   - **Audio Format**: Choose between WebM (smaller files) or WAV (better compatibility)
    - **On Change Action**: Select a microflow/nanoflow to execute after recording
 3. **Recording workflow**:
    - User clicks "Record" → microphone access requested and recording starts
@@ -35,6 +36,7 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 ```
 Context Object: Services_Integration.VibeFile
 Audio Content Attribute: VibeFile.AudioBase64
+Audio Format: WebM (or WAV for better compatibility)
 On Change Action: ACT_ProcessAudioFile
 ```
 
@@ -57,9 +59,10 @@ Audio Data: $VibeFile/AudioBase64
 // - Input: A FileDocument to be filled
 // - Output: FileDocument with the audio content
 
-// Step 2: Set the file extension manually to .webm
-// The widget records in WebM format, so you need to add the .webm extension
-// Set the FileDocument.Name to something like: "recording_" + currentDateTime + ".webm"
+// Step 2: Set the file extension based on your selected format
+// For WebM format: set extension to .webm
+// For WAV format: set extension to .wav
+// Set the FileDocument.Name to something like: "recording_" + currentDateTime + ".webm" (or ".wav")
 
 // Step 3: Save and use the FileDocument
 // Now you have a proper FileDocument that can be:
@@ -81,7 +84,7 @@ Audio Data: $VibeFile/AudioBase64
 
 3. **Change Object** (set file properties)
    - Object: `$NewFileDocument`
-   - Set `Name` to: `'recording_' + toString([%CurrentDateTime%]) + '.webm'`
+   - Set `Name` to: `'recording_' + toString([%CurrentDateTime%]) + '.webm'` (or `.wav` based on your format selection)
    - Set other properties as needed
 
 5. **Commit Object**
@@ -96,11 +99,16 @@ Clone this repository and import the widget into your Mendix project to see it i
 
 ## Technical Details
 
-- **Audio Format**: WebM (browser-dependent, typically WebM with Opus codec)
+- **Audio Formats**: WebM (with Opus codec) or WAV (uncompressed)
 - **Storage Format**: Base64 string
-- **File Extension**: `.webm` (must be set manually when creating FileDocument)
-- **File Size**: Varies by recording length and quality (typically ~1KB per second)
+- **File Extensions**: `.webm` or `.wav` (must be set manually when creating FileDocument)
+- **File Size**: 
+  - WebM: ~1KB per second (compressed)
+  - WAV: ~10KB per second (uncompressed)
 - **Browser Support**: Chrome, Firefox, Safari, Edge (modern versions with MediaRecorder API)
+- **Format Compatibility**:
+  - WebM: Better compression, smaller files, good browser support
+  - WAV: Larger files, better compatibility with audio software
 - **Permissions**: Requires user consent for microphone access
 - **Dependencies**: CommunityCommons module required for base64 to file conversion
 
@@ -147,7 +155,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Version History
 
-- **v1.0.0** - Initial release with modern UI, real-time waveform animation, recording timer, and CommunityCommons integration
+- **v1.0.0** - Initial release with modern UI, real-time waveform animation, recording timer, and dual-format support (WebM/WAV)
 
 ---
 
