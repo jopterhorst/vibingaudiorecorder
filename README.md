@@ -94,11 +94,11 @@ Audio Data: $VibeFile/AudioBase64
 
 #### Example Domain Model 
 
-![Example Domain Model ](docs\images\AudioRecorder_DomainModel.png)
+![Example Domain Model ](docs/images/AudioRecorder_DomainModel.png)
 
 #### Example Microflow 
 
-![Example Microflow Overview](docs\images\AudioRecorder_OnChangeMicroflow.png)
+![Example Microflow Overview](docs/images/AudioRecorder_OnChangeMicroflow.png)
 
 1. **Create a FileDocument object**
    - Return: `$NewFileDocument`
