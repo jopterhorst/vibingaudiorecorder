@@ -25,6 +25,8 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 
 ### Basic Setup
 
+![Widget on Page in Design Mode ](docs/images/AudioRecorder_DesignMode.png)
+
 1. **Add the widget** to any page with an object as context (e.g., Customer, Order, Document, etc.)
 2. **Configure the properties**:
    - **Audio Content Attribute**: Select a string attribute where the base64 audio will be stored
