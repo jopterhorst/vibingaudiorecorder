@@ -92,7 +92,13 @@ Audio Data: $VibeFile/AudioBase64
 // - Played back using HTML5 audio players
 ```
 
-#### Example Microflow Steps
+#### Example Domain Model 
+
+![Example Domain Model ](docs\images\AudioRecorder_DomainModel.png)
+
+#### Example Microflow 
+
+![Example Microflow Overview](docs\images\AudioRecorder_OnChangeMicroflow.png)
 
 1. **Create a FileDocument object**
    - Return: `$NewFileDocument`
@@ -104,7 +110,7 @@ Audio Data: $VibeFile/AudioBase64
 
 3. **Change Object** (set file properties)
    - Object: `$NewFileDocument`
-   - Set `Name` to: `'recording_' + toString([%CurrentDateTime%]) + '.webm'`
+   - Set `Name` to: `recording_' + formatDateTime([%CurrentDateTime%], 'yyyy-MM-dd_HH-mm-ss') + '.webm`
    - Set other properties as needed
 
 5. **Commit Object**
@@ -114,6 +120,8 @@ Audio Data: $VibeFile/AudioBase64
    - Download file, send via email, store in cloud, etc.
 
 ## Demo Project
+
+🌐 **Live Demo**: Try the widget in action at [https://vibingaudiorecorderdemo-sandbox.mxapps.io/](https://vibingaudiorecorderdemo-sandbox.mxapps.io/)
 
 Clone this repository and import the widget into your Mendix project to see it in action. The widget works with any entity that has a string attribute for storing the base64 audio content.
 
