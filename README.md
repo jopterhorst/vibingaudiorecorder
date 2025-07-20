@@ -11,7 +11,8 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 🎯 **Modern UI** - Beautiful gradient design with real-time waveform visualization  
 ⏱️ **Built-in Timer** - Shows recording duration in MM:SS format  
 🌊 **Live Waveform** - Real-time audio waveform animation that responds to sound levels  
-🎵 **WebM Format** - High-quality WebM audio recording with Opus codec for optimal compatibility  
+🎵 **Multiple Formats** - Choose between WebM (Opus codec) or WAV output format  
+🔄 **Smart Conversion** - Always records in WebM for quality, converts to WAV when selected  
 🔒 **Privacy Focused** - Properly releases microphone access after recording  
 📱 **Browser Compatible** - Works with modern browsers supporting MediaRecorder API  
 🔧 **Duration Fixing** - Automatically fixes WebM duration metadata using webm-duration-fix library  
@@ -71,7 +72,7 @@ First, download and import the **CommunityCommons** module from the Mendix Marke
 
 3. **Change Object** (set file properties)
    - Object: `$AudioFile`
-   - Set `Name` to: `recording_' + formatDateTime([%CurrentDateTime%], 'yyyy-MM-dd_HH-mm-ss') + '.webm`
+   - Set `Name` to: `recording_' + formatDateTime([%CurrentDateTime%], 'yyyy-MM-dd_HH-mm-ss') + '.webm'` (or `.wav` if WAV format selected)
    - Set other properties as needed
 
 5. **Commit Object**
@@ -137,6 +138,7 @@ Found a bug or have a feature request? Please create an issue on our [GitHub Iss
 ### Dependencies
 The widget uses the following key dependencies:
 - `webm-duration-fix` - Fixes WebM audio duration metadata
+- `audiobuffer-to-wav` - Converts WebM audio to WAV format
 - `classnames` - Utility for conditional CSS classes
 - `@mendix/pluggable-widgets-tools` - Mendix widget development tools
 

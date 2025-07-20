@@ -1,8 +1,8 @@
 {
   "name": "audiorecorderwidget",
   "widgetName": "AudioRecorderWidget",
-  "version": "1.0.0",
-  "description": "Modern audio recorder widget with configurable waveform colors, recording time limits, and customizable UI text for Mendix apps",
+  "version": "1.1.0",
+  "description": "Modern audio recorder widget with configurable output formats (WebM/WAV), waveform colors, recording time limits, and customizable UI text for Mendix apps",
   "copyright": "© Mendix Technology BV 2025. All rights reserved.",
   "author": "Jop ter Horst",
   "engines": {
@@ -19,7 +19,7 @@
     "start": "pluggable-widgets-tools start:server",
     "dev": "pluggable-widgets-tools start:web",
     "build": "pluggable-widgets-tools build:web",
-    "postbuild": "xcopy /Y dist\\1.0.0\\*.mpk \"C:\\Mendix\\Vibing Audio Recorder Demo-main\\widgets\\\" 2>nul || echo Build complete, .mpk file copied to Mendix project",
+    "postbuild": "xcopy /Y dist\\1.1.0\\*.mpk \"C:\\Mendix\\Vibing Audio Recorder Demo-main\\widgets\\\" 2>nul || echo Build complete, .mpk file copied to Mendix project",
     "deploy": "npm run build",
     "lint": "pluggable-widgets-tools lint",
     "lint:fix": "pluggable-widgets-tools lint:fix",
@@ -31,6 +31,7 @@
     "@types/big.js": "^6.0.2"
   },
   "dependencies": {
+    "audiobuffer-to-wav": "^1.0.0",
     "webm-duration-fix": "^1.0.4"
   },
   "resolutions": {

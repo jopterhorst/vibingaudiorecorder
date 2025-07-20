@@ -100,41 +100,118 @@ export type PreviewProps =
     | DatasourceProps;
 
 export function getProperties(
-    _values: AudioRecorderWidgetPreviewProps,
+    values: AudioRecorderWidgetPreviewProps,
     defaultProperties: Properties /* , target: Platform*/
 ): Properties {
-    // Do the values manipulation here to control the visibility of properties in Studio and Studio Pro conditionally.
-    /* Example
-    if (values.myProperty === "custom") {
-        delete defaultProperties.properties.myOtherProperty;
+    // Hide certain properties based on output format selection
+    if (values.outputFormat === "webm") {
+        // When WebM is selected, no additional properties needed
+    } else if (values.outputFormat === "wav") {
+        // When WAV is selected, no additional properties needed (conversion is automatic)
     }
-    */
+    
+    // Could add conditional logic here in the future, for example:
+    // - Hide certain text properties if a "simple mode" is enabled
+    // - Show advanced timing properties only when needed
+    
     return defaultProperties;
 }
 
-// export function check(_values: AudioRecorderWidgetPreviewProps): Problem[] {
-//     const errors: Problem[] = [];
-//     // Add errors to the above array to throw errors in Studio and Studio Pro.
-//     /* Example
-//     if (values.myProperty !== "custom") {
-//         errors.push({
-//             property: `myProperty`,
-//             message: `The value of 'myProperty' is different of 'custom'.`,
-//             url: "https://github.com/myrepo/mywidget"
-//         });
-//     }
-//     */
-//     return errors;
-// }
+export function check(values: AudioRecorderWidgetPreviewProps): Problem[] {
+    const errors: Problem[] = [];
+    
+    // Validate that an audio content attribute is selected
+    if (!values.audioContentAttribute) {
+        errors.push({
+            property: "audioContentAttribute",
+            message: "An audio content attribute must be selected to store the recorded audio.",
+            severity: "error"
+        });
+    }
+    
+    // Validate max recording minutes
+    if (values.maxRecordingMinutes !== null && (values.maxRecordingMinutes < 1 || values.maxRecordingMinutes > 300)) {
+        errors.push({
+            property: "maxRecordingMinutes",
+            message: "Maximum recording time must be between 1 and 300 minutes.",
+            severity: "error"
+        });
+    }
+    
+    // Validate waveform color format
+    if (values.waveformColor && !/^#[0-9A-Fa-f]{6}$/.test(values.waveformColor)) {
+        errors.push({
+            property: "waveformColor",
+            message: "Waveform color must be a valid hex color (e.g., #4facfe).",
+            severity: "warning"
+        });
+    }
+    
+    return errors;
+}
 
-// export function getPreview(values: AudioRecorderWidgetPreviewProps, isDarkMode: boolean, version: number[]): PreviewProps {
-//     // Customize your pluggable widget appearance for Studio Pro.
-//     return {
-//         type: "Container",
-//         children: []
-//     }
-// }
+export function getPreview(values: AudioRecorderWidgetPreviewProps, isDarkMode: boolean, _version: number[]): PreviewProps {
+    const formatText = values.outputFormat === "wav" ? "WAV" : "WebM";
+    const attributeText = values.audioContentAttribute ? ` → ${values.audioContentAttribute}` : " (No attribute)";
+    
+    return {
+        type: "Container",
+        borders: true,
+        borderRadius: 8,
+        backgroundColor: isDarkMode ? "#2d2d2d" : "#f8f9fa",
+        padding: 16,
+        children: [
+            {
+                type: "Container",
+                children: [
+                    {
+                        type: "Text",
+                        content: `Audio Recorder (${formatText})`,
+                        fontSize: 14,
+                        bold: true,
+                        fontColor: isDarkMode ? "#ffffff" : "#333333"
+                    },
+                    {
+                        type: "Text",
+                        content: attributeText,
+                        fontSize: 12,
+                        fontColor: isDarkMode ? "#cccccc" : "#666666"
+                    }
+                ]
+            },
+            {
+                type: "Container",
+                borderRadius: 6,
+                backgroundColor: isDarkMode ? "#404040" : "#e9ecef",
+                padding: 12,
+                children: [
+                    {
+                        type: "Text",
+                        content: values.readyText || "Press record to start",
+                        fontSize: 12,
+                        fontColor: isDarkMode ? "#cccccc" : "#6c757d"
+                    },
+                    {
+                        type: "Container",
+                        backgroundColor: values.waveformColor || "#4facfe",
+                        borderRadius: 3,
+                        children: [
+                            {
+                                type: "Text",
+                                content: "▄▃▅▂▆▃▄▅▂▃▆▄▃▅",
+                                fontSize: 10,
+                                fontColor: "#ffffff"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ]
+    };
+}
 
-// export function getCustomCaption(values: AudioRecorderWidgetPreviewProps, platform: Platform): string {
-//     return "AudioRecorderWidget";
-// }
+export function getCustomCaption(values: AudioRecorderWidgetPreviewProps, _platform: Platform): string {
+    const format = values.outputFormat === "wav" ? "WAV" : "WebM";
+    const attribute = values.audioContentAttribute || "No attribute";
+    return `Audio Recorder (${format}) → ${attribute}`;
+}

@@ -9,6 +9,7 @@ declare global {
 
 import { ReactElement, createElement, useRef, useState, useEffect } from "react";
 import fixWebmDuration from "webm-duration-fix";
+import audioBufferToWav from "audiobuffer-to-wav";
 import { AudioRecorderWidgetContainerProps } from "../typings/AudioRecorderWidgetProps";
 import "./ui/AudioRecorderWidget.css";
 
@@ -63,7 +64,8 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
         processingText,
         completedText,
         maxRecordingMinutes,
-        waveformColor
+        waveformColor,
+        outputFormat
     } = props;
     const [recording, setRecording] = useState(false);
     const [uploading, setUploading] = useState(false);
@@ -311,20 +313,64 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
         }
     };
 
+    // Function to convert WebM to WAV using Web Audio API
+    const convertWebMToWAV = async (webmBlob: Blob): Promise<Blob> => {
+        try {
+            debugLog("Converting WebM to WAV format");
+            
+            // Create a temporary audio context for conversion
+            const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+            
+            // Convert blob to array buffer
+            const arrayBuffer = await webmBlob.arrayBuffer();
+            
+            // Decode the WebM audio data
+            const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+            debugLog(`Decoded audio: ${audioBuffer.duration}s, ${audioBuffer.sampleRate}Hz, ${audioBuffer.numberOfChannels} channels`);
+            
+            // Convert AudioBuffer to WAV
+            const wavArrayBuffer = audioBufferToWav(audioBuffer);
+            
+            // Create WAV blob
+            const wavBlob = new Blob([wavArrayBuffer], { type: 'audio/wav' });
+            debugLog(`Converted to WAV: ${wavBlob.size} bytes`);
+            
+            // Clean up audio context
+            await audioContext.close();
+            
+            return wavBlob;
+        } catch (error) {
+            console.error("Error converting WebM to WAV:", error);
+            debugLog("Conversion failed, returning original WebM blob");
+            return webmBlob; // Return original on error
+        }
+    };
+
     const storeAudioAsBase64 = async (audioBlob: Blob, actualDurationSeconds?: number) => {
         setUploading(true);
 
         try {
             debugLog("Converting audio blob to base64");
+            debugLog("Selected output format:", outputFormat);
 
             // Use the provided duration or fall back to recordingTime
             const durationToUse = actualDurationSeconds ?? recordingTime;
             debugLog(`Using duration: ${durationToUse} seconds (provided: ${actualDurationSeconds}, recordingTime: ${recordingTime})`);
 
-            // Fix duration metadata before storing
+            // Fix duration metadata first (always on WebM source)
             const audioWithDuration = await fixAudioDuration(audioBlob);
 
-            // Convert the fixed audio blob to base64
+            // Convert to target format if needed
+            let finalAudioBlob: Blob;
+            if (outputFormat === "wav") {
+                debugLog("Converting WebM to WAV format");
+                finalAudioBlob = await convertWebMToWAV(audioWithDuration);
+            } else {
+                debugLog("Using WebM format (no conversion needed)");
+                finalAudioBlob = audioWithDuration;
+            }
+
+            // Convert the final audio blob to base64
             const reader = new FileReader();
             const cleanup = () => {
                 reader.onloadend = null;
@@ -333,11 +379,11 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
             reader.onloadend = () => {
                 try {
                     const base64String = reader.result as string;
-                    // Remove the data URL prefix (e.g., "data:audio/webm;base64,")
+                    // Remove the data URL prefix (e.g., "data:audio/webm;base64," or "data:audio/wav;base64,")
                     const base64Content = base64String.split(',')[1];
 
                     debugLog("Base64 conversion complete, length:", base64Content.length);
-                    debugLog("Recording duration was:", durationToUse, "seconds");
+                    debugLog("Final format:", outputFormat, "Recording duration was:", durationToUse, "seconds");
 
                     // Store the base64 content in the attribute
                     if (audioContentAttribute && audioContentAttribute.setValue) {
@@ -403,7 +449,7 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
             };
 
             // Start the conversion with the fixed audio
-            reader.readAsDataURL(audioWithDuration);
+            reader.readAsDataURL(finalAudioBlob);
 
         } catch (error) {
             console.error("Store process error:", error);
