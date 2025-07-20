@@ -1,6 +1,6 @@
 # Vibing Audio Recorder Widget
 
-A powerful Mendix pluggable widget that enables users to record audio directly from their microphone and automatically store it as base64 data in any string attribute. Perfect for voice notes, audio feedback, documentation, and user-generated audio content.
+A powerful Mendix pluggable widget that enables users to record audio directly from their microphone and automatically store base64 data in any string attribute. Perfect for voice notes, audio feedback, documentation, and user-generated audio content.
 
 ## Features
 
@@ -87,16 +87,17 @@ First, download and import the **CommunityCommons** module from the Mendix Marke
 
 ## Technical Details
 
-- **Audio Format**: WebM with Opus codec
+- **Audio Format**: WebM with Opus codec (source) or WAV (converted output)
 - **Storage Format**: Base64 string
-- **File Extension**: `.webm` (must be set manually when creating FileDocument)
-- **File Size**: ~1KB per second (compressed)
+- **File Extension**: `.webm` or `.wav` (must be set manually when creating FileDocument based on selected format)
+- **File Size**: ~1KB per second (WebM compressed) or ~88KB per second (WAV uncompressed)
 - **Maximum Recording Time**: Configurable limit (1-300 minutes, default: 120 minutes)
 - **Browser Support**: Chrome, Firefox, Safari, Edge (modern versions with MediaRecorder API)
-- **Format Compatibility**: Excellent compression with good browser support
+- **Format Compatibility**: WebM has excellent compression, WAV has universal compatibility
 - **Permissions**: Requires user consent for microphone access
 - **Dependencies**: 
   - webm-duration-fix library for proper audio duration metadata
+  - audiobuffer-to-wav library for WAV format conversion
 - **Security**: Production-safe logging and automatic recording limits
 
 ## Browser Compatibility
@@ -156,15 +157,21 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Version History
 
+- **v1.1.0** - Enhanced format support and Studio Pro experience
+  - 🎵 **Multiple Formats**: Added WAV output format option with smart WebM-to-WAV conversion
+  - 🎯 **Studio Pro Enhancement**: Rich visual preview with format display and validation
+  - 🔧 **Editor Config**: Professional widget configuration experience in Studio Pro
+  - 📝 **Smart Validation**: Real-time property validation with helpful error messages
+  - 🎨 **Visual Preview**: Custom widget captions and waveform preview in design mode
+
 - **v1.0.0** - Comprehensive audio recorder with configurable features
-  - � **Core**: Direct microphone recording with WebM format and Opus codec
-  - � **Customization**: Configurable UI text and waveform colors
+  - 🎤 **Core**: Direct microphone recording with WebM format and Opus codec
+  - 🎨 **Customization**: Configurable UI text and waveform colors
   - ⏰ **Flexibility**: Configurable recording time limits (1-300 minutes)
   - 🌊 **Visualization**: Real-time waveform animation with custom colors
-  - �️ **Security**: Production-safe logging and automatic recording limits
+  - 🛡️ **Security**: Production-safe logging and automatic recording limits
   - 🔧 **Integration**: Base64 storage with onChange action support
   - 📦 **Dependencies**: Enhanced with webm-duration-fix and security updates
-
 ---
 
 Made with ❤️ for the Mendix Community
