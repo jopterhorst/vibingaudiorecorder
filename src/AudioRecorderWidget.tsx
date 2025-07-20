@@ -162,15 +162,15 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
                 newWaveformData.push(height);
             }
 
-            // Debug logging (only log occasionally to avoid spam)
-            if (Math.random() < 0.1) {
-                console.log("Waveform data sample:", newWaveformData.slice(0, 5), "MediaRecorder state:", mediaRecorderRef.current.state);
+            // Debug logging (only log very occasionally to avoid spam)
+            if (Math.random() < 0.01) {
+                debugLog("Waveform data sample:", newWaveformData.slice(0, 5), "MediaRecorder state:", mediaRecorderRef.current.state);
             }
             
             setWaveformData(newWaveformData);
             animationRef.current = requestAnimationFrame(updateWaveform);
         } else {
-            console.log("UpdateWaveform not running - analyzer:", !!analyzerRef.current, "mediaRecorder state:", mediaRecorderRef.current?.state);
+            debugLog("UpdateWaveform not running - analyzer:", !!analyzerRef.current, "mediaRecorder state:", mediaRecorderRef.current?.state);
         }
     };
 
@@ -196,11 +196,11 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
             analyzerRef.current.smoothingTimeConstant = 0.8;
             source.connect(analyzerRef.current);
             
-            console.log("Audio analyzer setup complete, buffer length:", analyzerRef.current.frequencyBinCount);
+            debugLog("Audio analyzer setup complete, buffer length:", analyzerRef.current.frequencyBinCount);
 
             // Get the WebM MIME type
             const mimeType = getAudioMimeType();
-            console.log("Selected audio format: WebM, MIME type:", mimeType);
+            debugLog("Selected audio format: WebM, MIME type:", mimeType);
 
             // Create MediaRecorder with format-specific options
             const options = mimeType ? { mimeType } : {};
@@ -209,10 +209,10 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
             audioChunks.current = [];
 
             mediaRecorder.ondataavailable = event => {
-                console.log(`Debug: Data available - size: ${event.data.size}, type: ${event.data.type}`);
+                debugLog(`Data available - size: ${event.data.size}, type: ${event.data.type}`);
                 if (event.data.size > 0) {
                     audioChunks.current.push(event.data);
-                    console.log(`Debug: Added chunk, total chunks: ${audioChunks.current.length}`);
+                    debugLog(`Added chunk, total chunks: ${audioChunks.current.length}`);
                 } else {
                     console.warn("Debug: Received empty data chunk");
                 }
@@ -221,7 +221,7 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
             mediaRecorder.onstop = async () => {
                 // Preserve the recording duration before any cleanup
                 const finalRecordingDuration = recordingTime;
-                console.log(`Debug: Recording stopped, final duration: ${finalRecordingDuration} seconds`);
+                debugLog(`Recording stopped, final duration: ${finalRecordingDuration} seconds`);
                 
                 // Stop waveform animation
                 if (animationRef.current) {
@@ -245,13 +245,13 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
                 
                 // Create blob with WebM MIME type
                 const selectedMimeType = getAudioMimeType();
-                console.log(`Debug: Creating final blob from ${audioChunks.current.length} chunks`);
-                console.log(`Debug: Chunk sizes:`, audioChunks.current.map(chunk => chunk.size));
+                debugLog(`Creating final blob from ${audioChunks.current.length} chunks`);
+                debugLog(`Chunk sizes:`, audioChunks.current.map(chunk => chunk.size));
                 
                 const audioBlob = new Blob(audioChunks.current, { 
                     type: selectedMimeType || "audio/webm"
                 });
-                console.log("Created audio blob with type:", audioBlob.type, "size:", audioBlob.size);
+                debugLog("Created audio blob with type:", audioBlob.type, "size:", audioBlob.size);
                 
                 // Additional validation
                 if (audioBlob.size === 0) {
@@ -268,7 +268,7 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
             setRecording(true);
             
             // Start waveform animation
-            console.log("Starting waveform animation");
+            debugLog("Starting waveform animation");
             updateWaveform();
             
         } catch (err) {
@@ -294,8 +294,8 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
     // Function to fix WebM audio duration metadata using webm-duration-fix
     const fixAudioDuration = async (audioBlob: Blob): Promise<Blob> => {
         try {
-            console.log(`Debug: Attempting to fix WebM audio duration`);
-            console.log(`Debug: Blob type: ${audioBlob.type}, Blob size: ${audioBlob.size}`);
+            debugLog(`Attempting to fix WebM audio duration`);
+            debugLog(`Blob type: ${audioBlob.type}, Blob size: ${audioBlob.size}`);
             // Validate input
             if (!audioBlob || audioBlob.size === 0) {
                 console.error("Debug: Invalid or empty audio blob");
@@ -303,7 +303,7 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
             }
             // Use webm-duration-fix to patch the duration in the WebM header
             const fixedBlob = await fixWebmDuration(audioBlob);
-            console.log("Debug: WebM duration fixed using webm-duration-fix");
+            debugLog("WebM duration fixed using webm-duration-fix");
             return fixedBlob;
         } catch (error) {
             console.error("Error in fixAudioDuration:", error);
@@ -315,11 +315,11 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
         setUploading(true);
 
         try {
-            console.log("Debug: Converting audio blob to base64");
+            debugLog("Converting audio blob to base64");
 
             // Use the provided duration or fall back to recordingTime
             const durationToUse = actualDurationSeconds ?? recordingTime;
-            console.log(`Debug: Using duration: ${durationToUse} seconds (provided: ${actualDurationSeconds}, recordingTime: ${recordingTime})`);
+            debugLog(`Using duration: ${durationToUse} seconds (provided: ${actualDurationSeconds}, recordingTime: ${recordingTime})`);
 
             // Fix duration metadata before storing
             const audioWithDuration = await fixAudioDuration(audioBlob);
@@ -336,29 +336,55 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
                     // Remove the data URL prefix (e.g., "data:audio/webm;base64,")
                     const base64Content = base64String.split(',')[1];
 
-                    console.log("Debug: Base64 conversion complete, length:", base64Content.length);
-                    console.log("Debug: Recording duration was:", durationToUse, "seconds");
+                    debugLog("Base64 conversion complete, length:", base64Content.length);
+                    debugLog("Recording duration was:", durationToUse, "seconds");
 
                     // Store the base64 content in the attribute
                     if (audioContentAttribute && audioContentAttribute.setValue) {
                         audioContentAttribute.setValue(base64Content);
-                        console.log("Debug: Base64 content stored in attribute");
+                        debugLog("Base64 content stored in attribute");
 
                         // Trigger the onChange action
-                        debugLog("Debug: onChangeAction object:", onChangeAction);
-                        if (onChangeAction && onChangeAction.canExecute && onChangeAction.canExecute) {
-                            debugLog("Debug: Executing onChangeAction");
-                            onChangeAction.execute();
+                        debugLog("onChangeAction object:", onChangeAction);
+                        if (onChangeAction && onChangeAction.canExecute) {
+                            debugLog("Executing onChangeAction");
+                            try {
+                                onChangeAction.execute();
+                                
+                                // Clean up response objects if the function exists (newer Mendix versions)
+                                // This prevents the "releaseResponseObjects is not a function" error
+                                const actionWithCleanup = onChangeAction as any;
+                                if (actionWithCleanup.releaseResponseObjects && typeof actionWithCleanup.releaseResponseObjects === 'function') {
+                                    debugLog("Calling releaseResponseObjects for cleanup");
+                                    actionWithCleanup.releaseResponseObjects();
+                                } else {
+                                    debugLog("releaseResponseObjects not available (older Mendix version)");
+                                }
+                            } catch (error) {
+                                console.error("Error executing onChangeAction:", error);
+                                
+                                // Still try to clean up if possible, even if the action failed
+                                const actionWithCleanup = onChangeAction as any;
+                                if (actionWithCleanup.releaseResponseObjects && typeof actionWithCleanup.releaseResponseObjects === 'function') {
+                                    try {
+                                        actionWithCleanup.releaseResponseObjects();
+                                    } catch (cleanupError) {
+                                        console.error("Error during action cleanup:", cleanupError);
+                                    }
+                                }
+                                
+                                throw error; // Re-throw the original error
+                            }
                         } else {
-                            debugLog("Debug: No onChangeAction provided or cannot execute");
+                            debugLog("No onChangeAction provided or cannot execute");
                         }
 
                         // Success - no popup message
-                        console.log("Debug: Audio recording completed successfully");
+                        debugLog("Audio recording completed successfully");
                     } else {
                         console.error("Audio content attribute is not available or doesn't have setValue method");
-                        console.log("Debug: audioContentAttribute:", audioContentAttribute);
-                        window.mx.ui.error("Failed to store audio content - no attribute available");
+                        debugLog("audioContentAttribute:", audioContentAttribute);
+                        window.mx?.ui?.error("Failed to store audio content - no attribute available");
                     }
                 } finally {
                     setUploading(false);
@@ -369,7 +395,7 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
             reader.onerror = () => {
                 try {
                     console.error("Failed to convert audio to base64");
-                    window.mx.ui.error("Failed to convert audio to base64");
+                    window.mx?.ui?.error("Failed to convert audio to base64");
                 } finally {
                     setUploading(false);
                     cleanup();
@@ -381,7 +407,7 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
 
         } catch (error) {
             console.error("Store process error:", error);
-            window.mx.ui.error("Store failed: " + error);
+            window.mx?.ui?.error("Store failed: " + error);
             setUploading(false);
         }
     };

@@ -31,7 +31,6 @@
     "@types/big.js": "^6.0.2"
   },
   "dependencies": {
-    "classnames": "^2.2.6",
     "webm-duration-fix": "^1.0.4"
   },
   "resolutions": {

@@ -27,21 +27,6 @@
     pointer-events: none;
 }
 
-.recorder-header {
-    text-align: center;
-    margin-bottom: 12px;
-    z-index: 1;
-    display: none; /* Hidden by default */
-}
-
-.recorder-title {
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    margin: 0;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
 .control-row {
     display: flex;
     align-items: center;
@@ -110,13 +95,6 @@
     0% { box-shadow: 0 0 5px var(--waveform-glow-color, rgba(0, 255, 136, 0.3)); }
     50% { box-shadow: 0 0 20px var(--waveform-glow-color, rgba(0, 255, 136, 0.8)); }
     100% { box-shadow: 0 0 12px var(--waveform-glow-color, rgba(0, 255, 136, 0.6)); }
-}
-
-.control-buttons {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    z-index: 1;
 }
 
 .record-button {
