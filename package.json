@@ -19,7 +19,7 @@
     "start": "pluggable-widgets-tools start:server",
     "dev": "pluggable-widgets-tools start:web",
     "build": "pluggable-widgets-tools build:web",
-    "postbuild": "xcopy /Y dist\\1.0.0\\*.mpk \"C:\\Mendix\\Upstream YouTube-main\\widgets\\\" 2>nul || echo Build complete, .mpk file copied to Mendix project",
+    "postbuild": "xcopy /Y dist\\1.0.0\\*.mpk \"C:\\Mendix\\Vibing Audio Recorder Demo-main\\widgets\\\" 2>nul || echo Build complete, .mpk file copied to Mendix project",
     "deploy": "npm run build",
     "lint": "pluggable-widgets-tools lint",
     "lint:fix": "pluggable-widgets-tools lint:fix",
