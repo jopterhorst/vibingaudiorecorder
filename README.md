@@ -46,53 +46,12 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
    - OnChange action is triggered if configured
    - Microphone access is properly released
 
-### Example Configuration
-
-```
-Context Object: Services_Integration.VibeFile
-Audio Content Attribute: VibeFile.AudioBase64
-On Change Action: ACT_ProcessAudioFile
-
-Recording Settings:
-Max Recording Time: 30 (minutes - for shorter voice notes)
-Waveform Color: #ff6b6b (red theme to match app branding)
-
-Text Configuration (optional - customize for your language/use case):
-Ready Text: "Click to start recording"
-Recording Text: "Recording your voice..."
-Processing Text: "Processing your recording..."
-Completed Text: "Recording saved successfully"
-```
-
 ### Processing Audio Data
 
-After recording, you can access the base64 audio data in your microflows and convert it to a file:
+After recording, you can access the base64 audio data in your microflow and convert it to a file:
 
 #### Required Module
 First, download and import the **CommunityCommons** module from the Mendix Marketplace, which provides the necessary file conversion actions.
-
-#### Step-by-Step File Conversion
-
-```
-Input Parameter: $VibeFile (or your entity with the base64 audio data)
-Audio Data: $VibeFile/AudioBase64
-
-// Step 1: Convert base64 to FileDocument using CommunityCommons
-// Use the "Base64DecodeToFile" action from CommunityCommons module
-// - Input: $VibeFile/AudioBase64 (the base64 string)
-// - Input: A FileDocument to be filled
-// - Output: FileDocument with the audio content
-
-// Step 2: Set the file extension for WebM format
-// Set the FileDocument.Name to something like: "recording_" + currentDateTime + ".webm"
-
-// Step 3: Save and use the FileDocument
-// Now you have a proper FileDocument that can be:
-// - Downloaded by users
-// - Stored in your database
-// - Used in other microflows
-// - Played back using HTML5 audio players
-```
 
 #### Example Domain Model 
 
@@ -103,20 +62,20 @@ Audio Data: $VibeFile/AudioBase64
 ![Example Microflow Overview](docs/images/AudioRecorder_OnChangeMicroflow.png)
 
 1. **Create a FileDocument object**
-   - Return: `$NewFileDocument`
+   - Return: `$AudioFile`
 
 2. **Call CommunityCommons.Base64DecodeToFile**
-   - Parameter 1: `$VibeFile/AudioBase64`
-   - Parameter 2: `$NewFileDocument`
+   - Parameter 1: `$AudioObject/AudioBase64`
+   - Parameter 2: `$AudioFile`
    - Return: `Boolean`
 
 3. **Change Object** (set file properties)
-   - Object: `$NewFileDocument`
+   - Object: `$AudioFile`
    - Set `Name` to: `recording_' + formatDateTime([%CurrentDateTime%], 'yyyy-MM-dd_HH-mm-ss') + '.webm`
    - Set other properties as needed
 
 5. **Commit Object**
-   - Object: `$NewFileDocument`
+   - Object: `$AudioFile`
 
 6. **Further Processing** (optional)
    - Download file, send via email, store in cloud, etc.
@@ -124,8 +83,6 @@ Audio Data: $VibeFile/AudioBase64
 ## Demo Project
 
 🌐 **Live Demo**: Try the widget in action at [https://vibingaudiorecorderdemo-sandbox.mxapps.io/](https://vibingaudiorecorderdemo-sandbox.mxapps.io/)
-
-Clone this repository and import the widget into your Mendix project to see it in action. The widget works with any entity that has a string attribute for storing the base64 audio content.
 
 ## Technical Details
 
@@ -138,7 +95,6 @@ Clone this repository and import the widget into your Mendix project to see it i
 - **Format Compatibility**: Excellent compression with good browser support
 - **Permissions**: Requires user consent for microphone access
 - **Dependencies**: 
-  - CommunityCommons module required for base64 to file conversion
   - webm-duration-fix library for proper audio duration metadata
 - **Security**: Production-safe logging and automatic recording limits
 
@@ -156,9 +112,7 @@ Clone this repository and import the widget into your Mendix project to see it i
 🛡️ **Configurable Recording Limits** - Set custom maximum recording time (1-300 minutes) to prevent excessive memory usage  
 🔒 **Production-Safe Logging** - Debug logs only appear in development environments  
 🧹 **Memory Management** - Proper cleanup of audio contexts, media streams, and event listeners  
-🎯 **Input Validation** - Validates audio blobs and handles errors gracefully  
-🌐 **Customizable UI Text** - All user-facing text can be configured for localization and branding  
-🎨 **Custom Waveform Colors** - Personalize waveform appearance to match your app's theme  
+🎯 **Input Validation** - Validates audio blobs and handles errors gracefully 
 
 ## Issues, Suggestions and Feature Requests
 
