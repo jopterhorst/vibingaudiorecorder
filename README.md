@@ -1,5 +1,7 @@
 # Vibing Audio Recorder Widget
 
+![GIF of widget in recording mode ](docs/images/AudioRecorder_Recording.gif)
+
 A powerful Mendix pluggable widget that enables users to record audio directly from their microphone and automatically store base64 data in any string attribute. Perfect for voice notes, audio feedback, documentation, and user-generated audio content.
 
 ## Features
