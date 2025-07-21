@@ -65,6 +65,8 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
         completedText,
         maxRecordingMinutes,
         waveformColor,
+        gradientStartColor,
+        gradientEndColor,
         outputFormat
     } = props;
     const [recording, setRecording] = useState(false);
@@ -461,13 +463,23 @@ export function AudioRecorderWidget(props: AudioRecorderWidgetContainerProps): R
     // Generate waveform colors based on user configuration
     const waveformColors = generateWaveformColors(waveformColor || "#4facfe");
 
+    // Generate background gradient based on user configuration
+    const generateBackgroundGradient = (startColor: string, endColor: string): string => {
+        const validStartColor = startColor || "#667eea";
+        const validEndColor = endColor || "#764ba2";
+        return `linear-gradient(135deg, ${validStartColor} 0%, ${validEndColor} 100%)`;
+    };
+
+    const backgroundGradient = generateBackgroundGradient(gradientStartColor, gradientEndColor);
+
     return (
         <div 
             className="audio-recorder-container"
             style={{
                 "--waveform-inactive-color": waveformColors.inactive,
                 "--waveform-active-color": waveformColors.active,
-                "--waveform-glow-color": waveformColors.glow
+                "--waveform-glow-color": waveformColors.glow,
+                background: backgroundGradient
             } as React.CSSProperties}
         >
             <div className="control-row">

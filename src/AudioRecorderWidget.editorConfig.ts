@@ -147,12 +147,32 @@ export function check(values: AudioRecorderWidgetPreviewProps): Problem[] {
         });
     }
     
+    // Validate gradient start color format
+    if (values.gradientStartColor && !/^#[0-9A-Fa-f]{6}$/.test(values.gradientStartColor)) {
+        errors.push({
+            property: "gradientStartColor",
+            message: "Gradient start color must be a valid hex color (e.g., #667eea).",
+            severity: "warning"
+        });
+    }
+    
+    // Validate gradient end color format
+    if (values.gradientEndColor && !/^#[0-9A-Fa-f]{6}$/.test(values.gradientEndColor)) {
+        errors.push({
+            property: "gradientEndColor",
+            message: "Gradient end color must be a valid hex color (e.g., #764ba2).",
+            severity: "warning"
+        });
+    }
+    
     return errors;
 }
 
 export function getPreview(values: AudioRecorderWidgetPreviewProps, isDarkMode: boolean, _version: number[]): PreviewProps {
     const formatText = values.outputFormat === "wav" ? "WAV" : "WebM";
     const attributeText = values.audioContentAttribute ? ` → ${values.audioContentAttribute}` : " (No attribute)";
+    const gradientStart = values.gradientStartColor || "#667eea";
+    const gradientEnd = values.gradientEndColor || "#764ba2";
     
     return {
         type: "Container",
@@ -176,6 +196,12 @@ export function getPreview(values: AudioRecorderWidgetPreviewProps, isDarkMode: 
                         content: attributeText,
                         fontSize: 12,
                         fontColor: isDarkMode ? "#cccccc" : "#666666"
+                    },
+                    {
+                        type: "Text",
+                        content: `Gradient: ${gradientStart} → ${gradientEnd}`,
+                        fontSize: 10,
+                        fontColor: isDarkMode ? "#888888" : "#999999"
                     }
                 ]
             },

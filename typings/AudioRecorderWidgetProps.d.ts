@@ -17,6 +17,8 @@ export interface AudioRecorderWidgetContainerProps {
     onChangeAction?: ActionValue;
     maxRecordingMinutes: number;
     waveformColor: string;
+    gradientStartColor: string;
+    gradientEndColor: string;
     outputFormat: OutputFormatEnum;
     readyText: string;
     recordingText: string;
@@ -39,6 +41,8 @@ export interface AudioRecorderWidgetPreviewProps {
     onChangeAction: {} | null;
     maxRecordingMinutes: number | null;
     waveformColor: string;
+    gradientStartColor: string;
+    gradientEndColor: string;
     outputFormat: OutputFormatEnum;
     readyText: string;
     recordingText: string;

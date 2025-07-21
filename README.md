@@ -22,6 +22,7 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
 🛡️ **Security Enhanced** - Production-safe logging and error handling  
 🎨 **Configurable Text** - Customize all UI text messages for different languages and use cases  
 🌈 **Custom Waveform Colors** - Personalize waveform appearance with any hex color  
+🎨 **Custom Background Gradient** - Configure background gradient with custom start and end colors  
 ✨ **Vibe Coded** - This entire widget was crafted with pure vibes and good energy 🌟  
 
 ## Usage
@@ -37,6 +38,9 @@ A powerful Mendix pluggable widget that enables users to record audio directly f
    - **Recording Settings**:
      - **Max Recording Time**: Set maximum recording duration in minutes (1-300, default: 120)
      - **Waveform Color**: Customize waveform appearance with hex color (default: #4facfe)
+     - **Background Gradient Start Color**: Customize gradient start color with hex color (default: #667eea)
+     - **Background Gradient End Color**: Customize gradient end color with hex color (default: #764ba2)
+     - **Output Format**: Choose between WebM (Opus codec) or WAV output format
    - **Text Configuration**: Customize the UI text messages:
      - **Ready Text**: Text shown when ready to record (default: "Press record to start")
      - **Recording Text**: Text shown while recording (default: "Recording in progress...")
@@ -161,6 +165,7 @@ We welcome contributions! Please:
   - 🔧 **Editor Config**: Professional widget configuration experience in Studio Pro
   - 📝 **Smart Validation**: Real-time property validation with helpful error messages
   - 🎨 **Visual Preview**: Custom widget captions and waveform preview in design mode
+  - 🌈 **Custom Background Gradient**: Configurable background gradient with custom start and end colors
 
 - **v1.0.0** - Comprehensive audio recorder with configurable features
   - 🎤 **Core**: Direct microphone recording with WebM format and Opus codec

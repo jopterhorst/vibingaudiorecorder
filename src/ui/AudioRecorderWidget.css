@@ -4,7 +4,7 @@
     flex-direction: column;
     align-items: center;
     padding: 12px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Background gradient is set via inline styles - no fallback needed as defaults are handled in component */
     border-radius: 12px;
     box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
     backdrop-filter: blur(10px);

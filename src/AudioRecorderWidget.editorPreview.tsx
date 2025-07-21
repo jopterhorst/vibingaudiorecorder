@@ -3,9 +3,16 @@ import { AudioRecorderWidgetPreviewProps } from "../typings/AudioRecorderWidgetP
 
 export class preview extends Component<AudioRecorderWidgetPreviewProps> {
     render(): ReactNode {
+        const gradientStart = this.props.gradientStartColor || "#667eea";
+        const gradientEnd = this.props.gradientEndColor || "#764ba2";
+        const backgroundGradient = `linear-gradient(135deg, ${gradientStart} 0%, ${gradientEnd} 100%)`;
+        
         return (
             <div className={this.props.className} style={this.props.styleObject}>
-                <div className="audio-recorder-container">
+                <div 
+                    className="audio-recorder-container"
+                    style={{ background: backgroundGradient }}
+                >
                     <div className="control-row">
                         <div className="timer-display">
                             00:00
